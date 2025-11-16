@@ -1,0 +1,6 @@
+@PathOfIrregulars.API_HostAddress = http://localhost:5263
+
+GET {{PathOfIrregulars.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

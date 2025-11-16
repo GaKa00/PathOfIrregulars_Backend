@@ -1,0 +1,15 @@
+{
+    {
+        "Name": "Bam, Irregular",
+        "Type": "Climber",
+        "Power": 5,
+        "Effects": [
+            {
+                "EffectId": "BuffSelf",
+                "Parameters": { "amount": 2 }
+            }
+        ]
+    }
+
+
+}
