@@ -40,7 +40,7 @@ namespace PathOfIrregulars.Application.Services
                         return EffectResult.Fail("No target selected for DealDamage effect.");
                     }
 
-                    target.Power.Decrease(damage ?? 1);
+                    target.DecreasePower(damage ?? 1);
                     return EffectResult.Ok($"{card.Name} dealt {damage} damage to {target.Name}.");
                 },
 
@@ -51,7 +51,7 @@ namespace PathOfIrregulars.Application.Services
                     {
                         return EffectResult.Fail("No target selected for BuffCard effect.");
                     }
-                    targetCard.Power.Increase(buffAmount ?? 1);
+                    targetCard.IncreasePower(buffAmount ?? 1);
                     return EffectResult.Ok($"{card.Name} buffed {targetCard.Name} by {buffAmount}.");
                 },
 
@@ -61,7 +61,7 @@ namespace PathOfIrregulars.Application.Services
                     {
                         return EffectResult.Fail($"{card.Name} has no power to deal damage to itself.");
                     }
-                    card.Power.Decrease(damage ?? 1);
+                    card.DecreasePower(damage ?? 1);
                     return EffectResult.Ok($"{card.Name} dealt {damage} damage to itself.");
                 },
 
@@ -71,7 +71,7 @@ namespace PathOfIrregulars.Application.Services
                     {
                         return EffectResult.Fail($"{card.Name} is not a Climber, and therefore can't gain power.");
                     }
-                    card.Power.Increase(buffAmount ?? 1);
+                    card.IncreasePower(buffAmount ?? 1);
                     return EffectResult.Ok($"{card.Name} buffed itself by {buffAmount}.");
                 }
             };

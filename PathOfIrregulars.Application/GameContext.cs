@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using PathOfIrregulars.Domain.Entities;
-using PathOfIrregulars.Domain.Enums;
+
 
 namespace PathOfIrregulars.Application
 {
@@ -33,11 +28,47 @@ namespace PathOfIrregulars.Application
             PlayerOne = p1;
             PlayerTwo = p2;
             ActivePlayer = p1;
+
+            // Initial Draw
+            //for (int i = 1; i < 10; i++)
+            //{
+            //    DrawCard(PlayerOne);
+            //    Log( "p1 " + PlayerOne.Hand.Count);
+
+            //    DrawCard(PlayerTwo);
+            //    Log("p2" + PlayerTwo.Hand.Count);
+            //}
+
+          
+        
+
+            Log("Game started between " + PlayerOne.Name + " and " + PlayerTwo.Name);
+        }
+
+        public void StartTurn()
+        {
+            Log($"Turn {TurnCount} started for {ActivePlayer.Name}");
+
+            // decide who starts , by seeing who has the lowest score.
+            //set new floor test
+            //draw 4 cards or until 10 cards in hand
+        }
+
+        public void startRound()
+        {
+            PlayerOne.hasPassed = false;
+            PlayerTwo.hasPassed = false;
+            Log("New round started.");
+
+
         }
 
         public void EndTurn()
-        {
+        {//calculate effects that happen at end of turn
+            //calculate points
+
             ActivePlayer = Opponent;
+            
             TurnCount++;
         }
 

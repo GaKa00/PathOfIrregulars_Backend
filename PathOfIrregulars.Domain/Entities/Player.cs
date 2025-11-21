@@ -9,6 +9,9 @@ namespace PathOfIrregulars.Domain.Entities
         public List<Card> Deck { get; set; }
         public List<Card> Graveyard { get; set; }
 
+        public Lane[] Lanes { get; set; }
+
+        public int totalPower { get; set; } = 0;
         public int wonRounds { get; set; } = 0;
         public bool hasPassed { get; set; }
 
@@ -16,7 +19,6 @@ namespace PathOfIrregulars.Domain.Entities
         {
             if (Deck.Count == 0)
             {
-
                 return null;
             }
             var drawnCard = Deck[0];
@@ -32,6 +34,18 @@ namespace PathOfIrregulars.Domain.Entities
           
             return hasPassed;
         }
+
+        public int CalculateTotalPower()
+        {
+            int totalPower = 0;
+            foreach (var lane in Lanes)
+            {
+                totalPower += lane.CalculateLanePower();
+            }
+            return totalPower;
+        }
+
+
 
     }
 }

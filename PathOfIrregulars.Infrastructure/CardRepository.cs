@@ -1,30 +1,52 @@
 ﻿using System.Text.Json;
 using PathOfIrregulars.Domain.Entities;
 
-namespace PathOfIrregulars.Infrastructure;
-
-public class CardRepository
+namespace PathOfIrregulars.Infrastructure.Persistence
 {
-    private List<Card> _cards;
-
-    public CardRepository()
+ 
+    public class CardDatabaseFile
     {
-        _cards = new List<Card>();
-        LoadCardsFromJson();
+        public List<Card> Cards { get; set; } = new();
     }
 
-    private void LoadCardsFromJson()
+    public class CardRepository
     {
-        string json = File.ReadAllText("Data/Cards/cards.json");
-        _cards = JsonSerializer.Deserialize<List<Card>>(json)
-            ?? new List<Card>();
-    }
+        private Dictionary<string, Card> _cardsById;
 
-    public Card GetCardByName(string name)
-    {
-        return _cards.FirstOrDefault(c => c.Name == name)
-               ?? throw new InvalidOperationException($"Card {name} not found.");
-    }
+        public CardRepository(string jsonPath = "cards.json")
+        {
+            LoadCardsFromJson(jsonPath);
+        }
 
-    public IEnumerable<Card> GetAllCards() => _cards;
+        private void LoadCardsFromJson(string jsonPath)
+        {
+            if (!File.Exists(jsonPath))
+                throw new FileNotFoundException($"cards.json not found at: {jsonPath}");
+
+            string json = File.ReadAllText(jsonPath);
+
+            var db = JsonSerializer.Deserialize<CardDatabaseFile>(json,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            if (db == null || db.Cards == null)
+                throw new Exception("Cards.json is empty or malformed.");
+
+            // store by Id
+            _cardsById = db.Cards.ToDictionary(c => c.Id);
+        }
+
+        public Card GetCardById(string id)
+        {
+            if (!_cardsById.TryGetValue(id, out var card))
+                throw new InvalidOperationException($"Card ID '{id}' not found.");
+
+            return card.Clone();  
+        }
+
+     
+        public IEnumerable<Card> GetAll() => _cardsById.Values;
+    }
 }

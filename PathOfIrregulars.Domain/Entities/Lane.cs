@@ -11,5 +11,32 @@ namespace PathOfIrregulars.Domain.Entities
     {
         public List<Card> CardsInLane { get; set; }
         public LaneType LaneType { get; set; }
+
+        public Lane(LaneType type)
+        {
+            LaneType = type;
+            CardsInLane = new List<Card>();
+        }
+
+        public int Power { get; private set; }
+    public void AddPower(  int amount)
+    {
+        Power += amount;
+        }
+
+        public void RemovePower(int amount)
+        {
+            Power += amount;
+        }
+
+        public int CalculateLanePower()
+        {
+            return CardsInLane
+                .Where(c => c.Power != null)
+                .Sum(c => c.Power);
+        }
     }
-}
+
+
+
+    }

@@ -9,6 +9,6 @@ namespace PathOfIrregulars.Domain.Entities
    public class CardEffect
     {
         public string EffectId { get; set; }
-        public Dictionary<string, object> parameters { get; set; }
+        public Dictionary<string, object> Parameters { get; set; }
     }
 }

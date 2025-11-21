@@ -3,6 +3,13 @@
   <ItemGroup>
     <ProjectReference Include="..\PathOfIrregulars.Application\PathOfIrregulars.Application.csproj" />
     <ProjectReference Include="..\PathOfIrregulars.Domain\PathOfIrregulars.Domain.csproj" />
+	  <ProjectReference Include="..\PathOfIrregulars.Infrastructure\PathOfIrregulars.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Cards.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <PropertyGroup>

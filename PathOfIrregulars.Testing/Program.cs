@@ -1,30 +1,73 @@
-﻿using PathOfIrregulars.Application;
+﻿
+using PathOfIrregulars.Application;
 using PathOfIrregulars.Application.Services;
 using PathOfIrregulars.Domain.Entities;
-using PathOfIrregulars.Domain.ValueObjects;
+using PathOfIrregulars.Infrastructure.Profiles;
+using PathOfIrregulars.Infrastructure.Persistence;
 
-// Setup
-var context = new GameContext();
-var registry = new EffectRegistry();
-var cardService = new CardService(registry);
+Console.WriteLine(File.ReadAllText("cards.json"));
+var repo = new CardRepository("cards.json");
 
-var p1 = new Player { Name = "Bam" };
-var p2 = new Player { Name = "Khun" };
-context.StartGame(p1, p2);
-
-// Card to test
-var card = new Card
+// Fake user with 1 deck
+var user = new UserProfile
 {
-    Name = "Test Buff",
-    Power = new PowerValue(5),
-    CardEffects = new()
+    UserId = "user1",
+    Username = "BamMain",
+    SavedDecks = new Dictionary<string, List<string>>
     {
-        new CardEffect { EffectId = "BuffSelf" }
+        { "Starter", new List<string> { "bam_irregular",
+    "khun_strategist",
+    "rak_spear_bearer",
+    "anak_jahad",
+    "anak_jahad",
+    "endorse_kick",
+    "shinsu_barrier",
+    "lighthouse_scan",
+    "black_march",
+    "green_april",
+    "quant_ambush"  } }
     }
 };
 
-// Play the card
-var result = cardService.PlayCard(card, context);
+// Convert deck names → actual cards
+List<Card> deck = user.SavedDecks["Starter"]
+    .Select(id => repo.GetCardById(id))
+    .ToList();
+List<Card> deck2 = user.SavedDecks["Starter"]
+    .Select(id => repo.GetCardById(id))
+    .ToList();
+
+Console.WriteLine("deck claimed!");
+Thread.Sleep(500);
+// Build player
+var p1 = PlayerFactory.Create(user.Username, deck);
+var p2 = PlayerFactory.Create("KhunAI", deck2);
+Console.WriteLine("players created!");
+Thread.Sleep(500);
+
+// Create game context
+var context = new GameContext();
+context.StartGame(p1, p2);
+Console.WriteLine("game started!");
+
+// Put the first card into p1's hand manually for testing
+p1.DrawCard();
+Console.WriteLine($"{p1.Name} has {p1.Hand.Count} cards in hand.");
+
+p2.DrawCard();
+Console.WriteLine($"{p2.Name} has {p2.Hand.Count} cards in hand.");
+
+// Choose lane
+var lane = p1.Lanes[1]; // Midlane
+
+
+// Create services
+var registry = new EffectRegistry();
+var cardService = new CardService(registry);
+
+var cardToPlay = p1.Hand[0];
+var result = cardService.PlayCard(cardToPlay, context, lane);
+
 
 Console.WriteLine(result.Message);
-Console.WriteLine($"After play: {card.Power.Value}");
+Console.WriteLine($"Card power after effect: {cardToPlay.Power}");
