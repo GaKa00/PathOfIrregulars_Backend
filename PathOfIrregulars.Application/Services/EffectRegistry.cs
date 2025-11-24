@@ -82,6 +82,7 @@ namespace PathOfIrregulars.Application.Services
         {
             if (effectRegistry.TryGetValue(effectId, out var effectFunc))
                 return effectFunc(card, context, value);
+            Console.WriteLine( "Func" + effectFunc(card, context, value));
 
             return EffectResult.Fail($"Effect '{effectId}' not found.");
         }

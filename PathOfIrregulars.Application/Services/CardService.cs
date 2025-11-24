@@ -34,7 +34,13 @@ namespace PathOfIrregulars.Application.Services
       
             foreach (var effect in card.CardEffects)
             {
-                var result = _registry.Execute(effect.EffectId, card, context);
+                Console.WriteLine("In effect loop!");
+                var result = _registry.Execute(
+     effect.EffectId,
+     card,
+     context,
+     effect.GetAmount()
+ );
 
                 Console.WriteLine("executing effect" + effect.EffectId);
                 context.Log(result.Message);

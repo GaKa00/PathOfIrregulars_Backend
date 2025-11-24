@@ -49,6 +49,12 @@ Thread.Sleep(500);
 var context = new GameContext();
 context.StartGame(p1, p2);
 Console.WriteLine("game started!");
+foreach (var c in deck)
+{
+    Console.WriteLine($"{c.Name} has {c.CardEffects.Count} effects");
+    foreach (var e in c.CardEffects)
+        Console.WriteLine($" - {e.EffectId} ({e.Parameters.Count} params)");
+}
 
 // Put the first card into p1's hand manually for testing
 p1.DrawCard();

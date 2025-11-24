@@ -20,6 +20,8 @@ namespace PathOfIrregulars.Domain.Entities
         public CardType Type { get; set; }
         public int Power { get; set; }
         public bool HasPower => Power > 0;
+
+        [JsonPropertyName("Effects")]
         public List<CardEffect> CardEffects { get; set; } = new();
 
         public void IncreasePower(int amount)
@@ -46,7 +48,7 @@ namespace PathOfIrregulars.Domain.Entities
                     ?.Select(e => new CardEffect
                     {
                         EffectId = e.EffectId,
-                        Parameters = new Dictionary<string, object>(e.Parameters)
+                        Parameters = new Dictionary<string, int>(e.Parameters)
                     })
                     .ToList()
             };
