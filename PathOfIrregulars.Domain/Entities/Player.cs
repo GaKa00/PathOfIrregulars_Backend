@@ -11,9 +11,9 @@ namespace PathOfIrregulars.Domain.Entities
 
         public Lane[] Lanes { get; set; }
 
-        public int totalPower { get; set; } = 0;
-        public int wonRounds { get; set; } = 0;
-        public bool hasPassed { get; set; }
+        public int TotalPower { get; set; } = 0;
+        public int WonRounds { get; set; } = 0;
+        public bool HasPassed { get; set; }
 
         public Card DrawCard()
         {
@@ -58,13 +58,31 @@ namespace PathOfIrregulars.Domain.Entities
             return Hand[selectedIndex];
         }
 
-
-        public bool Pass()
+        public Lane SelectLane()
         {
-            hasPassed = true;
-          
-            return hasPassed;
+            for (int i = 0; i < Lanes.Length; i++)
+            {
+                Console.WriteLine($"{i}: {Lanes[i].LaneType} (Power: {Lanes[i].CalculateLanePower()})");
+            }
+            Console.WriteLine("Select a lane to play in:");
+            int selectedIndex;
+            string? input = Console.ReadLine();
+            while (!int.TryParse(input, out selectedIndex) || selectedIndex < 0 || selectedIndex >= Lanes.Length)
+            {
+                Console.WriteLine("Invalid selection. Try again:");
+                input = Console.ReadLine();
+            }
+            return Lanes[selectedIndex];
+
         }
+
+
+        //public bool Pass()
+        //{
+        //    hasPassed = true;
+          
+        //    return hasPassed;
+        //}
 
         public int CalculateTotalPower()
         {

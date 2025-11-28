@@ -62,12 +62,8 @@ var lane = p1.Lanes[1]; // Midlane
 
 
 // Create services
-var registry = new EffectRegistry();
-var cardService = new CardService(registry);
-
-var cardToPlay = p1.SelectCard();
-var result = cardService.PlayCard(cardToPlay, context, lane);
 
 
-Console.WriteLine(result.Message);
-Console.WriteLine($"Card power after effect: {cardToPlay.Power}");
+
+
+
