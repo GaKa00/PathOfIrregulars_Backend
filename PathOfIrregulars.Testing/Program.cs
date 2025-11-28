@@ -49,18 +49,12 @@ Thread.Sleep(500);
 var context = new GameContext();
 context.StartGame(p1, p2);
 Console.WriteLine("game started!");
-foreach (var c in deck)
-{
-    Console.WriteLine($"{c.Name} has {c.CardEffects.Count} effects");
-    foreach (var e in c.CardEffects)
-        Console.WriteLine($" - {e.EffectId} ({e.Parameters.Count} params)");
-}
 
-// Put the first card into p1's hand manually for testing
-p1.DrawCard();
+
+
 Console.WriteLine($"{p1.Name} has {p1.Hand.Count} cards in hand.");
 
-p2.DrawCard();
+
 Console.WriteLine($"{p2.Name} has {p2.Hand.Count} cards in hand.");
 
 // Choose lane
@@ -71,7 +65,7 @@ var lane = p1.Lanes[1]; // Midlane
 var registry = new EffectRegistry();
 var cardService = new CardService(registry);
 
-var cardToPlay = p1.Hand[0];
+var cardToPlay = p1.SelectCard();
 var result = cardService.PlayCard(cardToPlay, context, lane);
 
 

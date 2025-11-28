@@ -20,6 +20,7 @@ namespace PathOfIrregulars.Domain.Entities
             if (Deck.Count == 0)
             {
                 return null;
+                //lose game
             }
             var drawnCard = Deck[0];
             Deck.RemoveAt(0);
@@ -27,6 +28,36 @@ namespace PathOfIrregulars.Domain.Entities
        
             return drawnCard;
         }
+
+        public void ShuffleDeck()
+        {
+            var rnd = new Random();
+            Deck = Deck.OrderBy(x => rnd.Next()).ToList();
+        }   
+
+        public Card SelectCard()
+        {
+            for (int i = 0; i < Hand.Count; i++)
+            {
+                Console.WriteLine($"{i}: {Hand[i].Name} (Power: {Hand[i].Power})");
+            }
+
+            Console.WriteLine("Select a card to play");
+
+            int selectedIndex;
+
+          
+            string? input = Console.ReadLine();
+
+            while (!int.TryParse(input, out selectedIndex) || selectedIndex < 0 || selectedIndex >= Hand.Count)
+            {
+                Console.WriteLine("Invalid selection. Try again:");
+                input = Console.ReadLine();
+            }
+
+            return Hand[selectedIndex];
+        }
+
 
         public bool Pass()
         {

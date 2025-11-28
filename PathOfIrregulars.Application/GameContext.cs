@@ -25,22 +25,26 @@ namespace PathOfIrregulars.Application
 
         public void StartGame(Player p1, Player p2)
         {
+
             PlayerOne = p1;
             PlayerTwo = p2;
             ActivePlayer = p1;
 
-            // Initial Draw
-            //for (int i = 1; i < 10; i++)
-            //{
-            //    DrawCard(PlayerOne);
-            //    Log( "p1 " + PlayerOne.Hand.Count);
+            p1.ShuffleDeck();
+            p2.ShuffleDeck();   
 
-            //    DrawCard(PlayerTwo);
-            //    Log("p2" + PlayerTwo.Hand.Count);
-            //}
 
-          
-        
+            for (int i = 1; i < 10; i++)
+            {
+                DrawCard(PlayerOne);
+                Log("p1 " + PlayerOne.Hand.Count);
+
+                DrawCard(PlayerTwo);
+                Log("p2" + PlayerTwo.Hand.Count);
+            }
+
+
+
 
             Log("Game started between " + PlayerOne.Name + " and " + PlayerTwo.Name);
         }
