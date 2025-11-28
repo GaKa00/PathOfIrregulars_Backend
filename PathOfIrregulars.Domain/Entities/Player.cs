@@ -11,7 +11,7 @@ namespace PathOfIrregulars.Domain.Entities
 
         public Lane[] Lanes { get; set; }
 
-        public int TotalPower { get; set; } = 0;
+        public int TotalPower => CalculateTotalPower();
         public int WonRounds { get; set; } = 0;
         public bool HasPassed { get; set; }
 
@@ -91,6 +91,7 @@ namespace PathOfIrregulars.Domain.Entities
             {
                 totalPower += lane.CalculateLanePower();
             }
+            Console.WriteLine("Total Power (from player class): " + totalPower);
             return totalPower;
         }
 

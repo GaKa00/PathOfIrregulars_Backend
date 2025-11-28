@@ -122,6 +122,7 @@ namespace PathOfIrregulars.Application
 
             Log($"Turn {TurnCount} started for {player.Name}");
 
+       
 
             Log($" Total Power: {player.TotalPower}");
 
