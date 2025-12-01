@@ -47,6 +47,7 @@ namespace PathOfIrregulars.Domain.Entities
                 CardEffects = this.CardEffects
                     ?.Select(e => new CardEffect
                     {
+                        Trigger = e.Trigger,
                         EffectId = e.EffectId,
                         Parameters = new Dictionary<string, int>(e.Parameters)
                     })

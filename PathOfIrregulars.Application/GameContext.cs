@@ -31,17 +31,18 @@ namespace PathOfIrregulars.Application
 
         private CardService cardService { get; set; }
 
-
-
-
         public void StartGame(Player p1, Player p2)
         {
 
             cardService = new CardService(registry);
 
+
             PlayerOne = p1;
             PlayerTwo = p2;
-          
+
+   
+      
+
 
             p1.ShuffleDeck();
             p2.ShuffleDeck();   
@@ -61,6 +62,8 @@ namespace PathOfIrregulars.Application
             InitiateGameLoop();
 
         }
+
+
 
             public void InitiateGameLoop()
         {
@@ -265,6 +268,44 @@ namespace PathOfIrregulars.Application
             return cards;
 
         }
+
+  // CARD FUNCTIONS
+
+
+        public void SelectEnemyTarget(Player player)
+            {
+            Log($"{player.Name}, select a target card from opponent's field:");
+            var opponentLanes = Opponent.Lanes;
+         
+            var allCards = new List<Card>();
+            foreach (var lane in opponentLanes)
+            {
+                allCards.AddRange(lane.CardsInLane);
+            }
+            for (int i = 0; i < allCards.Count; i++)
+            {
+                Log($"{i + 1}: {allCards[i].Name} (Power: {allCards[i].Power})");
+            }
+
+            if (allCards.Count == 0)
+            {
+                Log("No cards available to target.");
+                return;
+            }
+            var input = Console.ReadLine();
+            if (int.TryParse(input, out int choice) && choice > 0 && choice <= allCards.Count)
+            {
+                var selectedCard = allCards[choice - 1];
+                Log($"{player.Name} selected {selectedCard.Name} as target.");
+                TargetCard = selectedCard;
+            }
+            else
+            {
+                Log("Invalid selection. No target selected.");
+                
+            }
+        }
+
 
         public Card DrawCard(Player player)
         {

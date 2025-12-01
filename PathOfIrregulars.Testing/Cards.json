@@ -7,6 +7,7 @@
       "Power": 5,
       "Effects": [
         {
+          "EffectTrigger": "OnPlay",
           "EffectId": "BuffSelf",
           "Parameters": { "amount": 2 }
         }
@@ -19,6 +20,7 @@
       "Power": 4,
       "Effects": [
         {
+          "EffectTrigger": "OnPlay",
           "EffectId": "DrawCard",
           "Parameters": { "amount": 1 }
         }
@@ -38,6 +40,7 @@
       "Power": 6,
       "Effects": [
         {
+          "EffectTrigger": "OnPlay",
           "EffectId": "DealDamageToTarget",
           "Parameters": { "amount": 2 }
         }
@@ -50,6 +53,7 @@
       "Power": 0,
       "Effects": [
         {
+          "EffectTrigger": "OnPlay",
           "EffectId": "DealDamageToTarget",
           "Parameters": { "amount": 4 }
         }
@@ -62,6 +66,7 @@
       "Power": 0,
       "Effects": [
         {
+          "EffectTrigger": "OnPlay",
           "EffectId": "BuffCardToTarget",
           "Parameters": { "amount": 3 }
         }
@@ -74,6 +79,7 @@
       "Power": 0,
       "Effects": [
         {
+          "EffectTrigger": "OnPlay",
           "EffectId": "DrawCard",
           "Parameters": { "amount": 2 }
         }
@@ -86,6 +92,7 @@
       "Power": 0,
       "Effects": [
         {
+          "EffectTrigger": "OnPlay",
           "EffectId": "BuffSelf",
           "Parameters": { "amount": 4 }
         }
@@ -98,6 +105,7 @@
       "Power": 0,
       "Effects": [
         {
+          "EffectTrigger": "OnPlay",
           "EffectId": "DealDamageToTarget",
           "Parameters": { "amount": 3 }
         }
@@ -110,6 +118,7 @@
       "Power": 0,
       "Effects": [
         {
+          "EffectTrigger": "OnPlay",
           "EffectId": "DealDamageToTarget",
           "Parameters": { "amount": 6 }
         }

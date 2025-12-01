@@ -19,6 +19,9 @@ namespace PathOfIrregulars.Application.Services
         {
             effectRegistry = new Dictionary<string, Func<Card, GameContext, int?, EffectResult>>
             {
+
+               
+
                 //draw a card
                 ["DrawCard"] = (card, context, amount) =>
                 {
@@ -34,6 +37,8 @@ namespace PathOfIrregulars.Application.Services
                 //deal damage to target
                 ["DealDamageToTarget"] = (card, context, damage) =>
                 {
+                    // TODO: later select between all targets
+                    context.SelectEnemyTarget(context.ActivePlayer);
                     var target = context.TargetCard;
                     if (target == null)
                     {
@@ -41,7 +46,15 @@ namespace PathOfIrregulars.Application.Services
                     }
 
                     target.DecreasePower(damage ?? 1);
+
+                    if (target.Power == 0)
+                    {
+                        context.Opponent.Lanes.FirstOrDefault(l => l.CardsInLane.Contains(target))?.CardsInLane.Remove(target);
+                        context.Opponent.Graveyard.Add(target);
+                        context.Log($"{target.Name} has been destroyed and sent to the graveyard.");
+                    }
                     return EffectResult.Ok($"{card.Name} dealt {damage} damage to {target.Name}.");
+               
                 },
 
                 ["BuffCardToTarget"] = (card, context, buffAmount) =>
