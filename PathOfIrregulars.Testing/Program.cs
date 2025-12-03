@@ -52,13 +52,7 @@ Console.WriteLine("game started!");
 
 
 
-Console.WriteLine($"{p1.Name} has {p1.Hand.Count} cards in hand.");
 
-
-Console.WriteLine($"{p2.Name} has {p2.Hand.Count} cards in hand.");
-
-// Choose lane
-var lane = p1.Lanes[1]; // Midlane
 
 
 

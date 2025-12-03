@@ -65,33 +65,34 @@ namespace PathOfIrregulars.Application
 
 
 
-            public void InitiateGameLoop()
+public void InitiateGameLoop()
+{
+    StartRound();
+
+    while (true)
+    {
+        StartTurn(ActivePlayer);
+        EndTurn();
+
+        if (PlayerOne.HasPassed && PlayerTwo.HasPassed)
         {
-            StartRound();
-
-            while ( PlayerOne.HasPassed == false && PlayerTwo.HasPassed == false)
-            {
-              StartTurn(ActivePlayer);
-               
-            }
             EndRound();
-
-
-            if (PlayerOne.WonRounds >= 2)
+            
+            if (PlayerOne.WonRounds == 2)
             {
                 EndGame(PlayerOne);
+                return;
             }
-            else if (PlayerTwo.WonRounds >= 2)
+            if (PlayerTwo.WonRounds == 2)
             {
                 EndGame(PlayerTwo);
-            }
-            else
-            {
-                StartRound();
-               
+                return;
             }
 
+            StartRound(); 
         }
+    }
+}
 
        public void InitializeFloorTest()
         {
@@ -129,13 +130,16 @@ namespace PathOfIrregulars.Application
 
             Log($" Total Power: {player.TotalPower}");
 
+
+            //temporary pass, will later make into a own api call (TODO)
             Console.WriteLine("Would you like to Pass?");
             var input = Console.ReadLine();
             if (input != null && input.ToLower() == "pass")
             {
                 player.HasPassed = true;
                 Log($"{player.Name} has passed.");
-                EndTurn(player);
+               
+               EndTurn();
                 return;
             }
 
@@ -149,8 +153,8 @@ namespace PathOfIrregulars.Application
 
 
             var result = cardService.PlayCard(cardToPlay, this, lane);
-           
-            EndTurn(player);
+
+            return;
 
 
         }
@@ -189,31 +193,39 @@ namespace PathOfIrregulars.Application
                 }
             }
 
-
             //set new floor test
+          
+
+
 
 
 
         }
 
-        public void EndTurn(Player player)
+        public void EndTurn()
         {//calculate effects that happen at end of turn
 
-            player.CalculateTotalPower();
+            ActivePlayer.CalculateTotalPower();
+            Console.WriteLine(ActivePlayer);
 
             TurnCount++;
 
-            if (Opponent.HasPassed)             {
-                Log($"{Opponent.Name} has passed. Skipping turn switch.");
-            
+            if (PlayerOne.HasPassed && PlayerTwo.HasPassed) {
+                Log($"Both players have passed, Starting new Round");
                 return;
             }
 
-         
+            if (Opponent.HasPassed)             {
+                Log($"{Opponent.Name} has passed. Skipping turn switch.");
+
+                return;
+            }
+        
+
+
             ActivePlayer = Opponent;
  
 
-            StartTurn(ActivePlayer);
         }
 
         public void EndRound()
@@ -225,15 +237,18 @@ namespace PathOfIrregulars.Application
             {
                 PlayerOne.WonRounds++;
                 Log($"{PlayerOne.Name} wins the round!");
+                ResetField();
             }
             else if (PlayerTwo.TotalPower > PlayerOne.TotalPower)
             {
                 PlayerTwo.WonRounds++;
                 Log($"{PlayerTwo.Name} wins the round!");
+                ResetField();
             }
             else
             {
                 Log("The round is a tie!");
+                ResetField();
             }
 
 
@@ -267,6 +282,14 @@ namespace PathOfIrregulars.Application
             }
             return cards;
 
+        }
+
+        public void ResetField()
+        {
+
+            PlayerOne.Reset();
+            PlayerTwo.Reset();
+          
         }
 
   // CARD FUNCTIONS

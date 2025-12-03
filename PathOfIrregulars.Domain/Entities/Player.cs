@@ -95,7 +95,21 @@ namespace PathOfIrregulars.Domain.Entities
             return totalPower;
         }
 
+        public void Reset()
+        {
+            foreach (var lane in Lanes)
+            {
+                foreach (var card in lane.CardsInLane.ToList())
+                {
+                    Graveyard.Add(card);
+                }
 
+                lane.CardsInLane.Clear();
+              
+            }
+
+            HasPassed = false;
+        }
 
     }
 }
