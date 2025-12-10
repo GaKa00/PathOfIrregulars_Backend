@@ -13,6 +13,7 @@ namespace PathOfIrregulars.Domain.Enums
         OnTurnEnd,
         OnDeath,
         OnLaneEnter,
-        OnLaneLeave
+        OnLaneLeave,
+        OnEquip
     }
 };

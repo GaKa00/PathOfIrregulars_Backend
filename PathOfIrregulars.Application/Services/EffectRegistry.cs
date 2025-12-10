@@ -37,8 +37,8 @@ namespace PathOfIrregulars.Application.Services
                 //deal damage to target
                 ["DealDamageToTarget"] = (card, context, damage) =>
                 {
-                    // TODO: later select between all targets
-                    context.SelectEnemyTarget(context.ActivePlayer);
+                   
+                    context.SelectTargetCard();
                     var target = context.TargetCard;
                     if (target == null)
                     {
@@ -50,6 +50,7 @@ namespace PathOfIrregulars.Application.Services
                     if (target.Power == 0)
                     {
                         context.Opponent.Lanes.FirstOrDefault(l => l.CardsInLane.Contains(target))?.CardsInLane.Remove(target);
+                        context.HandleCardDeathEffect(target);
                         context.Opponent.Graveyard.Add(target);
                         context.Log($"{target.Name} has been destroyed and sent to the graveyard.");
                     }
@@ -59,6 +60,7 @@ namespace PathOfIrregulars.Application.Services
 
                 ["BuffCardToTarget"] = (card, context, buffAmount) =>
                 {
+                    context.SelectTargetCard();
                     var targetCard = context.TargetCard;
                     if (targetCard == null)
                     {
@@ -75,6 +77,14 @@ namespace PathOfIrregulars.Application.Services
                         return EffectResult.Fail($"{card.Name} has no power to deal damage to itself.");
                     }
                     card.DecreasePower(damage ?? 1);
+
+                    if (card.Power == 0)
+                    {
+                        context.Opponent.Lanes.FirstOrDefault(l => l.CardsInLane.Contains(card))?.CardsInLane.Remove(card);
+                        context.HandleCardDeathEffect(card);
+                        context.Opponent.Graveyard.Add(card);
+                        context.Log($"{card.Name} has been destroyed and sent to the graveyard.");
+                    }
                     return EffectResult.Ok($"{card.Name} dealt {damage} damage to itself.");
                 },
 

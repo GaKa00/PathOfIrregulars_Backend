@@ -18,6 +18,9 @@ namespace PathOfIrregulars.Domain.Entities
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public CardType Type { get; set; }
+
+        public Card? EquippedTo { get; set; } 
+        public List<Card> EquippedArtifacts { get; set; } = new();
         public int Power { get; set; }
         public bool HasPower => Power > 0;
 
@@ -34,6 +37,7 @@ namespace PathOfIrregulars.Domain.Entities
         {
             Power = Math.Max(0, Power - amount);
         }
+
 
         public Card Clone()
         {

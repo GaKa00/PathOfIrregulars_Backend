@@ -33,10 +33,14 @@ namespace PathOfIrregulars.Application.Services
            
                 lane.AddPower(card.Power);
             }
-            else
+            else if (card.Type == CardType.Artifact)
             {
-                // SPELL or ARTIFACT
-                context.Log($"{context.ActivePlayer.Name} casts {card.Name}.");
+                context.Log($"{context.ActivePlayer.Name} equips {card.Name}.");
+
+               
+                context.EquipArtifact(card);
+
+                return EffectResult.Ok($"{card.Name} equipped.");
             }
 
             // Execute effects
@@ -65,10 +69,7 @@ namespace PathOfIrregulars.Application.Services
         }
 
 
-        //public EffectResult HandleEndOfTurnEffects( Card card, GameContext context)
-        //{
-
-        //}
+       
 
         //public EffectResult HandleOnDeathEffects( Card card, GameContext context)
         //{
@@ -76,15 +77,5 @@ namespace PathOfIrregulars.Application.Services
         //}
 
 
-        //public void EffectCycler(Card card , GameContext context, Lane? lane)
-        //{
-        //    if( card.CardTrigger == "OnPlay")
-
-
-
-
-
-
-        //}
     }
 }

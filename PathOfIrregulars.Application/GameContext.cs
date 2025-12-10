@@ -1,6 +1,7 @@
 ﻿
 using PathOfIrregulars.Application.Services;
 using PathOfIrregulars.Domain.Entities;
+using PathOfIrregulars.Domain.Enums;
 using System.Data.Common;
 using System.Numerics;
 
@@ -30,15 +31,30 @@ namespace PathOfIrregulars.Application
         private EffectRegistry registry { get; set; } = new EffectRegistry();
 
         private CardService cardService { get; set; }
+        public Board Board { get;  private set; }
+
+        public void SetupBoard()
+        {
+            Board = new Board
+            {
+                PlayerOneLanes = new List<Lane>(),
+                PlayerTwoLanes = new List<Lane>()
+            };
+
+            // Copy lanes from players
+            Board.PlayerOneLanes.AddRange(PlayerOne.Lanes);
+            Board.PlayerTwoLanes.AddRange(PlayerTwo.Lanes);
+        }
 
         public void StartGame(Player p1, Player p2)
         {
 
             cardService = new CardService(registry);
-
-
             PlayerOne = p1;
             PlayerTwo = p2;
+            SetupBoard();
+
+
 
    
       
@@ -165,7 +181,8 @@ public void InitiateGameLoop()
             PlayerTwo.HasPassed = false;
             Log("New round started.");
 
-            
+            HandleStartTurnEffects(ActivePlayer);
+            HandleStartTurnEffects(Opponent);
 
 
             if (PlayerOne.WonRounds > PlayerTwo.WonRounds)
@@ -206,7 +223,9 @@ public void InitiateGameLoop()
         {//calculate effects that happen at end of turn
 
             ActivePlayer.CalculateTotalPower();
-            Console.WriteLine(ActivePlayer);
+
+            HandleEndTurnEffects(ActivePlayer);
+            HandleEndTurnEffects(Opponent);
 
             TurnCount++;
 
@@ -292,42 +311,125 @@ public void InitiateGameLoop()
           
         }
 
-  // CARD FUNCTIONS
 
+        //EFFECT HANDLERS
 
-        public void SelectEnemyTarget(Player player)
-            {
-            Log($"{player.Name}, select a target card from opponent's field:");
-            var opponentLanes = Opponent.Lanes;
-         
-            var allCards = new List<Card>();
-            foreach (var lane in opponentLanes)
-            {
-                allCards.AddRange(lane.CardsInLane);
-            }
-            for (int i = 0; i < allCards.Count; i++)
-            {
-                Log($"{i + 1}: {allCards[i].Name} (Power: {allCards[i].Power})");
-            }
+        public void HandleEndTurnEffects(Player player)
+        {
+            if (player?.Lanes == null) return;
 
-            if (allCards.Count == 0)
+            foreach (var lane in player.Lanes ?? Enumerable.Empty<Lane>())
             {
-                Log("No cards available to target.");
-                return;
-            }
-            var input = Console.ReadLine();
-            if (int.TryParse(input, out int choice) && choice > 0 && choice <= allCards.Count)
-            {
-                var selectedCard = allCards[choice - 1];
-                Log($"{player.Name} selected {selectedCard.Name} as target.");
-                TargetCard = selectedCard;
-            }
-            else
-            {
-                Log("Invalid selection. No target selected.");
-                
+                if (lane?.CardsInLane == null) continue;
+
+                foreach (var card in lane.CardsInLane)
+                {
+                    if (card.CardEffects == null) continue;
+
+                    foreach (var effect in card.CardEffects)
+                    {
+                        if (effect.Trigger == EffectTrigger.OnTurnEnd)
+                        {
+                            registry.Execute(effect.EffectId, card, this, effect.GetAmount());
+                        }
+                    }
+                }
             }
         }
+
+        public void HandleStartTurnEffects(Player player)
+        {
+            if (player?.Lanes == null) return; 
+
+            foreach (var lane in player.Lanes ?? Enumerable.Empty<Lane>())
+            {
+                if (lane?.CardsInLane == null) continue; 
+
+                foreach (var card in lane.CardsInLane)
+                {
+                    if (card.CardEffects == null) continue; 
+
+                    foreach (var effect in card.CardEffects)
+                    {
+                        if (effect.Trigger == EffectTrigger.OnTurnStart)
+                        {
+                            registry.Execute(effect.EffectId, card, this, effect.GetAmount());
+                        }
+                    }
+                }
+            }
+        }
+        public void EquipArtifact(Card artifact)
+        {
+        
+            SelectTargetCard();
+            var targetClimber = this.TargetCard;
+
+            if (targetClimber == null)
+            {
+                Log("No valid climber selected to equip.");
+                ActivePlayer.Graveyard.Add(artifact);
+                return;
+            }
+
+            targetClimber.EquippedArtifacts.Add(artifact);
+            artifact.EquippedTo = targetClimber;
+
+            Log($"{artifact.Name} equipped to {targetClimber.Name}.");
+
+       
+            foreach (var effect in artifact.CardEffects.Where(e => e.Trigger == EffectTrigger.OnEquip))
+            {
+                registry.Execute(effect.EffectId, artifact, this, effect.GetAmount());
+            }
+        }
+
+        public void HandleCardDeathEffect(Card card)
+        {
+           
+            foreach (var effect in card.CardEffects.Where(e => e.Trigger == EffectTrigger.OnDeath))
+            {
+                registry.Execute(effect.EffectId, card, this, effect.GetAmount());
+            }
+
+        }
+
+        // CARD FUNCTIONS
+        public void SelectTargetCard()
+        {
+
+            Console.WriteLine("In aelect card target");
+           
+            foreach (var c in Board.CardsInPlay)
+                Console.WriteLine($"{c.Name} - ID: {c.Id}");
+
+            Console.WriteLine("Enter the ID of the card you want to target:");
+
+            while (true)
+            {
+                var input = Console.ReadLine()?.Trim();
+
+                if (string.IsNullOrWhiteSpace(input))
+                {
+                    Log("Invalid input. Enter a valid card ID.");
+                    continue;
+                }
+
+                var card = Board.CardsInPlay.FirstOrDefault(c => c.Id == input);
+
+                if (card == null)
+                {
+                    Log("No card found with that ID. Try again.");
+                    continue;
+                }
+
+                TargetCard = card;
+                Log($"{card.Name} has been targeted.");
+                break;
+            }
+        }
+
+
 
 
         public Card DrawCard(Player player)
