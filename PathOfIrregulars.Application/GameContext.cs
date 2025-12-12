@@ -361,7 +361,7 @@ public void InitiateGameLoop()
         }
         public void EquipArtifact(Card artifact)
         {
-        
+            Log($"CardEffects count: {artifact.CardEffects.Count}");
             SelectTargetCard();
             var targetClimber = this.TargetCard;
 

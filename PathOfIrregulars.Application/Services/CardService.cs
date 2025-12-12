@@ -35,7 +35,7 @@ namespace PathOfIrregulars.Application.Services
             }
             else if (card.Type == CardType.Artifact)
             {
-                context.Log($"{context.ActivePlayer.Name} equips {card.Name}.");
+          
 
                
                 context.EquipArtifact(card);
