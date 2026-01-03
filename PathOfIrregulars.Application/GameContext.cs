@@ -28,10 +28,12 @@ namespace PathOfIrregulars.Application
 
         public FloorTest floorTest { get; set; }
       
-        private EffectRegistry registry { get; set; } = new EffectRegistry();
+        private EffectRegistry Registry { get; set; } = new EffectRegistry();
 
         private CardService cardService { get; set; }
         public Board Board { get;  private set; }
+
+        public GameState GameState { get; set; }
 
         public void SetupBoard()
         {
@@ -49,7 +51,8 @@ namespace PathOfIrregulars.Application
         public void StartGame(Player p1, Player p2)
         {
 
-            cardService = new CardService(registry);
+            GameState = GameState.GameStart;
+            cardService = new CardService(Registry);
             PlayerOne = p1;
             PlayerTwo = p2;
             SetupBoard();
@@ -146,6 +149,10 @@ public void InitiateGameLoop()
 
             Log($" Total Power: {player.TotalPower}");
 
+         GameState = player == PlayerOne
+        ? GameState.Player1Turn
+        : GameState.Player2Turn;
+
 
             //temporary pass, will later make into a own api call (TODO)
             Console.WriteLine("Would you like to Pass?");
@@ -177,12 +184,15 @@ public void InitiateGameLoop()
 
         public void StartRound()
         {
+            GameState = GameState.RoundStart;
             PlayerOne.HasPassed = false;
             PlayerTwo.HasPassed = false;
             Log("New round started.");
 
-            HandleStartTurnEffects(ActivePlayer);
-            HandleStartTurnEffects(Opponent);
+            ResolveTrigger(EffectTrigger.OnTurnStart, owner:PlayerOne);
+
+           ResolveTrigger(EffectTrigger.OnTurnStart, owner: PlayerTwo);
+
 
 
             if (PlayerOne.WonRounds > PlayerTwo.WonRounds)
@@ -222,10 +232,10 @@ public void InitiateGameLoop()
         public void EndTurn()
         {//calculate effects that happen at end of turn
 
-            ActivePlayer.CalculateTotalPower();
 
-            HandleEndTurnEffects(ActivePlayer);
-            HandleEndTurnEffects(Opponent);
+            ActivePlayer.CalculateTotalPower();
+            ResolveTrigger(EffectTrigger.OnTurnEnd, owner: ActivePlayer);
+            ResolveTrigger(EffectTrigger.OnTurnEnd, owner: Opponent); 
 
             TurnCount++;
 
@@ -249,7 +259,9 @@ public void InitiateGameLoop()
 
         public void EndRound()
         {
-    PlayerOne.CalculateTotalPower();
+
+            GameState = GameState.RoundEnd;
+            PlayerOne.CalculateTotalPower();
     PlayerTwo.CalculateTotalPower();
             Log($"Round ended. {PlayerOne.Name} has {PlayerOne.TotalPower} Power. {PlayerTwo.Name} has {PlayerTwo.TotalPower} Power");
             if (PlayerOne.TotalPower > PlayerTwo.TotalPower)
@@ -275,6 +287,7 @@ public void InitiateGameLoop()
 
         public void EndGame(Player winner)
         {
+            GameState = GameState.GameEnd;
             Winner = winner;
             HasGameEnded = true;
         }
@@ -314,51 +327,80 @@ public void InitiateGameLoop()
 
         //EFFECT HANDLERS
 
-        public void HandleEndTurnEffects(Player player)
+        public void ResolveTrigger(
+    EffectTrigger trigger,
+    Card? sourceCard = null,
+    Player? owner = null
+)
         {
-            if (player?.Lanes == null) return;
+            var cards = Board.CardsInPlay;
 
-            foreach (var lane in player.Lanes ?? Enumerable.Empty<Lane>())
+           
+            if (sourceCard != null && !cards.Contains(sourceCard))
+                cards = cards.Append(sourceCard);
+
+            foreach (var card in cards)
             {
-                if (lane?.CardsInLane == null) continue;
-
-                foreach (var card in lane.CardsInLane)
+                foreach (var effect in card.CardEffects
+                             .Where(e => e.Trigger == trigger))
                 {
-                    if (card.CardEffects == null) continue;
-
-                    foreach (var effect in card.CardEffects)
-                    {
-                        if (effect.Trigger == EffectTrigger.OnTurnEnd)
-                        {
-                            registry.Execute(effect.EffectId, card, this, effect.GetAmount());
-                        }
-                    }
+                    Registry.Execute(
+                        effect.EffectId,
+                        card,
+                        this,
+                        effect.GetAmount()
+                    );
                 }
             }
         }
 
-        public void HandleStartTurnEffects(Player player)
-        {
-            if (player?.Lanes == null) return; 
 
-            foreach (var lane in player.Lanes ?? Enumerable.Empty<Lane>())
-            {
-                if (lane?.CardsInLane == null) continue; 
+        //TODO: replace the handle turn effects with this generic function above
+        //public void HandleEndTurnEffects(Player player)
+        //{
+        //    if (player?.Lanes == null) return;
 
-                foreach (var card in lane.CardsInLane)
-                {
-                    if (card.CardEffects == null) continue; 
+        //    foreach (var lane in player.Lanes ?? Enumerable.Empty<Lane>())
+        //    {
+        //        if (lane?.CardsInLane == null) continue;
 
-                    foreach (var effect in card.CardEffects)
-                    {
-                        if (effect.Trigger == EffectTrigger.OnTurnStart)
-                        {
-                            registry.Execute(effect.EffectId, card, this, effect.GetAmount());
-                        }
-                    }
-                }
-            }
-        }
+        //        foreach (var card in lane.CardsInLane)
+        //        {
+        //            if (card.CardEffects == null) continue;
+
+        //            foreach (var effect in card.CardEffects)
+        //            {
+        //                if (effect.Trigger == EffectTrigger.OnTurnEnd)
+        //                {
+        //                    registry.Execute(effect.EffectId, card, this, effect.GetAmount());
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+
+        //public void HandleStartTurnEffects(Player player)
+        //{
+        //    if (player?.Lanes == null) return; 
+
+        //    foreach (var lane in player.Lanes ?? Enumerable.Empty<Lane>())
+        //    {
+        //        if (lane?.CardsInLane == null) continue; 
+
+        //        foreach (var card in lane.CardsInLane)
+        //        {
+        //            if (card.CardEffects == null) continue; 
+
+        //            foreach (var effect in card.CardEffects)
+        //            {
+        //                if (effect.Trigger == EffectTrigger.OnTurnStart)
+        //                {
+        //                    registry.Execute(effect.EffectId, card, this, effect.GetAmount());
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
         public void EquipArtifact(Card artifact)
         {
             Log($"CardEffects count: {artifact.CardEffects.Count}");
@@ -377,22 +419,22 @@ public void InitiateGameLoop()
 
             Log($"{artifact.Name} equipped to {targetClimber.Name}.");
 
-       
+
             foreach (var effect in artifact.CardEffects.Where(e => e.Trigger == EffectTrigger.OnEquip))
             {
-                registry.Execute(effect.EffectId, artifact, this, effect.GetAmount());
+                Registry.Execute(effect.EffectId, artifact, this, effect.GetAmount());
             }
         }
 
-        public void HandleCardDeathEffect(Card card)
-        {
-           
-            foreach (var effect in card.CardEffects.Where(e => e.Trigger == EffectTrigger.OnDeath))
-            {
-                registry.Execute(effect.EffectId, card, this, effect.GetAmount());
-            }
+        //public void HandleCardDeathEffect(Card card)
+        //{
 
-        }
+        //    foreach (var effect in card.CardEffects.Where(e => e.Trigger == EffectTrigger.OnDeath))
+        //    {
+        //        registry.Execute(effect.EffectId, card, this, effect.GetAmount());
+        //    }
+
+        //}
 
         // CARD FUNCTIONS
         public void SelectTargetCard()

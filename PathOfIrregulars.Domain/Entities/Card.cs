@@ -24,6 +24,10 @@ namespace PathOfIrregulars.Domain.Entities
         public int Power { get; set; }
         public bool HasPower => Power > 0;
 
+        public bool IsDestroyed { get; set; } = false; 
+        
+        public bool IsUntargetable { get; set; } = false;
+
         [JsonPropertyName("Effects")]
         public List<CardEffect> CardEffects { get; set; } = new();
 

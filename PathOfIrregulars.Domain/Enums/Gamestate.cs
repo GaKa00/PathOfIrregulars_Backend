@@ -9,7 +9,13 @@ namespace PathOfIrregulars.Domain.Enums
   
         public enum GameState
         {
-         Waiting, Playing, RoundEnd, GameEnd
-        }
+         
+            GameStart,
+            RoundStart,
+            Player1Turn,
+            Player2Turn,
+            RoundEnd,
+            GameEnd
+    }
     
 }
