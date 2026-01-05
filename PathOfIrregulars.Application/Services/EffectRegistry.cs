@@ -233,7 +233,7 @@ namespace PathOfIrregulars.Application.Services
        int? value = null
    )
     {
-        if (_executors.TryGetValue(effectId, out var effectFunc))
+        if (!_executors.TryGetValue(effectId, out var effectFunc))
             return EffectResult.Fail($"Effect '{effectId}' not found.");
 
         return effectFunc(card, context, value);
