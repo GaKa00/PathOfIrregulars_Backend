@@ -355,52 +355,7 @@ public void InitiateGameLoop()
         }
 
 
-        //TODO: replace the handle turn effects with this generic function above
-        //public void HandleEndTurnEffects(Player player)
-        //{
-        //    if (player?.Lanes == null) return;
 
-        //    foreach (var lane in player.Lanes ?? Enumerable.Empty<Lane>())
-        //    {
-        //        if (lane?.CardsInLane == null) continue;
-
-        //        foreach (var card in lane.CardsInLane)
-        //        {
-        //            if (card.CardEffects == null) continue;
-
-        //            foreach (var effect in card.CardEffects)
-        //            {
-        //                if (effect.Trigger == EffectTrigger.OnTurnEnd)
-        //                {
-        //                    registry.Execute(effect.EffectId, card, this, effect.GetAmount());
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
-        //public void HandleStartTurnEffects(Player player)
-        //{
-        //    if (player?.Lanes == null) return; 
-
-        //    foreach (var lane in player.Lanes ?? Enumerable.Empty<Lane>())
-        //    {
-        //        if (lane?.CardsInLane == null) continue; 
-
-        //        foreach (var card in lane.CardsInLane)
-        //        {
-        //            if (card.CardEffects == null) continue; 
-
-        //            foreach (var effect in card.CardEffects)
-        //            {
-        //                if (effect.Trigger == EffectTrigger.OnTurnStart)
-        //                {
-        //                    registry.Execute(effect.EffectId, card, this, effect.GetAmount());
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
         public void EquipArtifact(Card artifact)
         {
             Log($"CardEffects count: {artifact.CardEffects.Count}");
@@ -440,7 +395,6 @@ public void InitiateGameLoop()
         public void SelectTargetCard()
         {
 
-            Console.WriteLine("In aelect card target");
            
             foreach (var c in Board.CardsInPlay)
                 Console.WriteLine($"{c.Name} - ID: {c.Id}");
