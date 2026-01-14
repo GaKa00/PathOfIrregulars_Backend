@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PathOfIrregulars.Infrastructure
+namespace PathOfIrregulars.Infrastructure.Database.Models
 {
    public class Deck
     {
@@ -12,6 +12,6 @@ namespace PathOfIrregulars.Infrastructure
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public string Name { get; set; }
-        public List<DeckCards> Cards { get; set; } = new();
+        public List<DeckCard> Cards { get; set; } = new();
     }
 }

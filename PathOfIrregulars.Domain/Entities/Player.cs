@@ -1,8 +1,10 @@
 ﻿
+using PathOfIrregulars.Domain.Enums;
+
 namespace PathOfIrregulars.Domain.Entities
 
 {
-  public class Player
+    public class Player
     {
         public string Name { get; set; }
         public List<Card> Hand { get; set; }
@@ -15,17 +17,20 @@ namespace PathOfIrregulars.Domain.Entities
         public int WonRounds { get; set; } = 0;
         public bool HasPassed { get; set; }
 
+
+
+
         public Card DrawCard()
         {
             if (Deck.Count == 0)
             {
-                return null;
-                //lose game
+             throw new InvalidOperationException("Cannot draw a card from an empty deck.");
+
             }
             var drawnCard = Deck[0];
             Deck.RemoveAt(0);
             Hand.Add(drawnCard);
-       
+
             return drawnCard;
         }
 
@@ -33,7 +38,7 @@ namespace PathOfIrregulars.Domain.Entities
         {
             var rnd = new Random();
             Deck = Deck.OrderBy(x => rnd.Next()).ToList();
-        }   
+        }
 
         public Card SelectCard()
         {
@@ -46,7 +51,7 @@ namespace PathOfIrregulars.Domain.Entities
 
             int selectedIndex;
 
-          
+
             string? input = Console.ReadLine();
 
             while (!int.TryParse(input, out selectedIndex) || selectedIndex < 0 || selectedIndex >= Hand.Count)
@@ -80,7 +85,7 @@ namespace PathOfIrregulars.Domain.Entities
         //public bool Pass()
         //{
         //    hasPassed = true;
-          
+
         //    return hasPassed;
         //}
 
@@ -105,11 +110,31 @@ namespace PathOfIrregulars.Domain.Entities
                 }
 
                 lane.CardsInLane.Clear();
-              
+
             }
 
             HasPassed = false;
         }
 
+    
+
+
+    public Player(string name, List<Card> deck)
+        {
+            Name = name;
+
+            Deck = deck;
+            Hand = new List<Card>();
+            Graveyard = new List<Card>();
+
+            Lanes = new[]
+            {
+        new Lane(LaneType.Vanguard),
+        new Lane(LaneType.Midrange),
+        new Lane(LaneType.Backline)
+    };
+
+            ShuffleDeck();
+        }
     }
 }

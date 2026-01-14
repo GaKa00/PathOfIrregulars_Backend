@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using PathOfIrregulars.Domain.Entities;
+using PathOfIrregulars.Application.Contracts;
 
 namespace PathOfIrregulars.Infrastructure.Persistence
 {
@@ -9,7 +10,7 @@ namespace PathOfIrregulars.Infrastructure.Persistence
         public List<Card> Cards { get; set; } = new();
     }
 
-    public class CardRepository
+    public class CardRepository : ICardRepository
     {
         private Dictionary<string, Card> _cardsById;
 
@@ -48,5 +49,15 @@ namespace PathOfIrregulars.Infrastructure.Persistence
 
      
         public IEnumerable<Card> GetAll() => _cardsById.Values;
+
+        public Card GetCard(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<Card> GetAllCards()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

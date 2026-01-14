@@ -1,6 +1,6 @@
 ﻿using PathOfIrregulars.Domain.Entities;
 
-namespace PathOfIrregulars.Infrastructure.Profiles
+namespace PathOfIrregulars.Infrastructure.Database.Models
 {
     public class UserProfile
     {
@@ -12,7 +12,7 @@ namespace PathOfIrregulars.Infrastructure.Profiles
             public DateTime CreatedAt { get; set; }
         
 
-        public Dictionary<string, List<string>> SavedDecks { get; set; }
+        public Dictionary<string, List<Deck>> SavedDecks { get; set; }
             = new();
     }
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PathOfIrregulars.Infrastructure
+namespace PathOfIrregulars.Infrastructure.Database.Models
 {
     public class DeckCard
     {
