@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11408.102 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PathOfIrregulars.Domain", "PathOfIrregulars.Domain\PathOfIrregulars.Domain.csproj", "{0D68872C-3B0A-494E-9AB4-FD6C8AD81947}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PathOfIrregulars.Testing", "PathOfIrregulars.Testing\PathOfIrregulars.Testing.csproj", "{C0A43C48-ABE9-4158-BB94-CCE1F650B162}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PathOfIrregulars.API2", "PathOfIrregulars.API2\PathOfIrregulars.API2.csproj", "{8EA0CD4E-2F90-4451-935A-E31DA45C153B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,18 @@ Global
 		{C0A43C48-ABE9-4158-BB94-CCE1F650B162}.Release|x64.Build.0 = Release|Any CPU
 		{C0A43C48-ABE9-4158-BB94-CCE1F650B162}.Release|x86.ActiveCfg = Release|Any CPU
 		{C0A43C48-ABE9-4158-BB94-CCE1F650B162}.Release|x86.Build.0 = Release|Any CPU
+		{8EA0CD4E-2F90-4451-935A-E31DA45C153B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EA0CD4E-2F90-4451-935A-E31DA45C153B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EA0CD4E-2F90-4451-935A-E31DA45C153B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8EA0CD4E-2F90-4451-935A-E31DA45C153B}.Debug|x64.Build.0 = Debug|Any CPU
+		{8EA0CD4E-2F90-4451-935A-E31DA45C153B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8EA0CD4E-2F90-4451-935A-E31DA45C153B}.Debug|x86.Build.0 = Debug|Any CPU
+		{8EA0CD4E-2F90-4451-935A-E31DA45C153B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EA0CD4E-2F90-4451-935A-E31DA45C153B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EA0CD4E-2F90-4451-935A-E31DA45C153B}.Release|x64.ActiveCfg = Release|Any CPU
+		{8EA0CD4E-2F90-4451-935A-E31DA45C153B}.Release|x64.Build.0 = Release|Any CPU
+		{8EA0CD4E-2F90-4451-935A-E31DA45C153B}.Release|x86.ActiveCfg = Release|Any CPU
+		{8EA0CD4E-2F90-4451-935A-E31DA45C153B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
