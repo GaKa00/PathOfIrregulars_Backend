@@ -2,6 +2,7 @@
 using PathOfIrregulars.Domain.Entities;
 using PathOfIrregulars.Application.Contracts;
 
+
 namespace PathOfIrregulars.Infrastructure.Persistence
 {
  

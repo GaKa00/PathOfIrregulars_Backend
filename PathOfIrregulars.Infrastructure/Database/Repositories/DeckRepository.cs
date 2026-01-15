@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace PathOfIrregulars.Infrastructure.Database.Repositories
 {
-    internal class DeckRepository
+    public class DeckRepository : IDeckRepository
     {
 
         private readonly GameDbContext _context;

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace PathOfIrregulars.Infrastructure.Database.Repositories
 {
-    public class AccountRepository
+    public class AccountRepository : IAccountRepository
     {
         private readonly GameDbContext _context;
 
