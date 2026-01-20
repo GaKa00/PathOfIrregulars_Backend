@@ -1,0 +1,120 @@
+{
+  "Cards": [
+    {
+      "Id": "bam_irregular",
+      "Name": "Bam, Irregular",
+      "Type": "Climber",
+      "Power": 5,
+      "Effects": [
+        {
+          "EffectId": "BuffSelf",
+          "Parameters": { "amount": 2 }
+        }
+      ]
+    },
+    {
+      "Id": "khun_strategist",
+      "Name": "Khun, Strategist",
+      "Type": "Climber",
+      "Power": 4,
+      "Effects": [
+        {
+          "EffectId": "DrawCard",
+          "Parameters": { "amount": 1 }
+        }
+      ]
+    },
+    {
+      "Id": "rak_spear_bearer",
+      "Name": "Rak, Spear Bearer",
+      "Type": "Climber",
+      "Power": 7,
+      "Effects": []
+    },
+    {
+      "Id": "anak_jahad",
+      "Name": "Anak Jahad",
+      "Type": "Climber",
+      "Power": 6,
+      "Effects": [
+        {
+          "EffectId": "DealDamageToTarget",
+          "Parameters": { "amount": 2 }
+        }
+      ]
+    },
+    {
+      "Id": "endorse_kick",
+      "Name": "Endorsi's Kick",
+      "Type": "Spell",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "DealDamageToTarget",
+          "Parameters": { "amount": 4 }
+        }
+      ]
+    },
+    {
+      "Id": "shinsu_barrier",
+      "Name": "Shinsu Barrier",
+      "Type": "Spell",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "BuffCardToTarget",
+          "Parameters": { "amount": 3 }
+        }
+      ]
+    },
+    {
+      "Id": "lighthouse_scan",
+      "Name": "Lighthouse Scan",
+      "Type": "Spell",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "DrawCard",
+          "Parameters": { "amount": 2 }
+        }
+      ]
+    },
+    {
+      "Id": "black_march",
+      "Name": "Black March",
+      "Type": "Artifact",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "BuffSelf",
+          "Parameters": { "amount": 4 }
+        }
+      ]
+    },
+    {
+      "Id": "green_april",
+      "Name": "Green April",
+      "Type": "Artifact",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "DealDamageToTarget",
+          "Parameters": { "amount": 3 }
+        }
+      ]
+    },
+    {
+      "Id": "quant_ambush",
+      "Name": "Quant's Ambush",
+      "Type": "Spell",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "DealDamageToTarget",
+          "Parameters": { "amount": 6 }
+        }
+      ]
+    }
+  ]
+}
+
