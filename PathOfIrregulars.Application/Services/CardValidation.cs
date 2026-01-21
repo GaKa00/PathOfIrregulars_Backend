@@ -1,12 +1,5 @@
 ﻿using PathOfIrregulars.Domain.Entities;
 using PathOfIrregulars.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace PathOfIrregulars.Application.Services
 {
     internal class CardValidation
@@ -31,7 +24,7 @@ namespace PathOfIrregulars.Application.Services
 
             //check that game and round is not yet ended
 
-            if (context.GameState == Domain.Enums.GameState.RoundEnd || context.GameState == Domain.Enums.GameState.GameEnd)
+            if (context.GameState == GameState.RoundEnd || context.GameState == GameState.GameEnd)
             {
                 return false;
             }
@@ -50,7 +43,7 @@ namespace PathOfIrregulars.Application.Services
 
             //for spell and artifact, check that lane is null
 
-            if ((card.Type == Domain.Enums.CardType.Spell || card.Type == Domain.Enums.CardType.Artifact) && lane != null) {
+            if ((card.Type == CardType.Spell || card.Type == CardType.Artifact) && lane != null) {
             }
 
             return true;
@@ -111,19 +104,19 @@ namespace PathOfIrregulars.Application.Services
             switch (effect.Trigger)
             {
                 case EffectTrigger.OnPlay:
-                    if (context.GameState != Domain.Enums.GameState.Player1Turn)
+                    if (context.GameState != GameState.Player1Turn)
                         return false;
                     break;
 
              
 
                 case EffectTrigger.OnTurnStart:
-                    if (context.GameState != Domain.Enums.GameState.Player1Turn)
+                    if (context.GameState != GameState.Player1Turn)
                         return false;
                     break;
 
                 case EffectTrigger.OnTurnEnd:
-                    if (context.GameState != Domain.Enums.GameState.Player1Turn)
+                    if (context.GameState != GameState.Player1Turn)
                         return false;
                     break;
             }
@@ -159,12 +152,12 @@ namespace PathOfIrregulars.Application.Services
 
             //check that game is not over
 
-            if (context.GameState == Domain.Enums.GameState.GameEnd)
+            if (context.GameState == GameState.GameEnd)
             {
                 return false;
             }
             //check that round is not over
-            if (context.GameState == Domain.Enums.GameState.RoundEnd)
+            if (context.GameState == GameState.RoundEnd)
             {
                 return false;
             }

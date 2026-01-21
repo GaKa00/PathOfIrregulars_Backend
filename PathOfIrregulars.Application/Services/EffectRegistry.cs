@@ -17,7 +17,7 @@ namespace PathOfIrregulars.Application.Services
        
         private readonly Dictionary<string, EffectDefinition> _definitions;
 
-
+        // gets effect definition for selected effect
         public EffectDefinition GetDefinition(string effectId)
         {
             if (!_definitions.TryGetValue(effectId, out var def))
@@ -27,7 +27,7 @@ namespace PathOfIrregulars.Application.Services
 
             return def;
         }
-
+        // builds registry and registers all effects
         public EffectRegistry()
         {
             _executors = new();
@@ -36,6 +36,7 @@ namespace PathOfIrregulars.Application.Services
             RegisterEffects();
         }
 
+        // helper method to register effects into the registry
         private void Register(string id,
             EffectDefinition definition,
             Func<Card, GameContext, int?, EffectResult> executor)
@@ -48,6 +49,8 @@ namespace PathOfIrregulars.Application.Services
 
         private void RegisterEffects()
         {
+
+            // drawcard - limited to max 5 cards, can be triggered on play only, and will only draw for active player (for now)
             Register(
                  "DrawCard",
                  new EffectDefinition
@@ -69,7 +72,7 @@ namespace PathOfIrregulars.Application.Services
                  }
              );
 
-            //deal damage to target
+            // deal damage to target card effect, requires a target that can be either enemy or own card, can be triggered on play, death or equip (in case of artifact), 
             Register(
                      "DealDamageToTarget",
                       new EffectDefinition
@@ -106,7 +109,7 @@ namespace PathOfIrregulars.Application.Services
                             );
                         }
                         );
-
+            // buff target card effect, requires a target that can be either enemy or own card, can be triggered on play, death or equip (in case of artifact),
             Register(
                 "BuffCardToTarget",
                 new EffectDefinition
@@ -130,7 +133,7 @@ namespace PathOfIrregulars.Application.Services
                     return EffectResult.Ok($"{card.Name} buffed {targetCard.Name} by {buffAmount}.");
                 }
                 );
-
+            // deal damage to self effect, cannot target other cards, can be triggered on play or turn start (typically a setback for big power cards)
             Register(
                 "DealDamageToSelf",
                 new EffectDefinition
@@ -160,6 +163,7 @@ namespace PathOfIrregulars.Application.Services
 
                 );
 
+            // buff self effect, cannot target other cards, can be triggered on play or turn start
             Register("BuffSelf",
                 new EffectDefinition
                 {
@@ -178,6 +182,7 @@ namespace PathOfIrregulars.Application.Services
              }
              );
 
+            // heal target effect, requires a target that can be either enemy or own card, can be triggered on play
             Register(
                 "HealTarget",
                 new EffectDefinition
@@ -199,6 +204,7 @@ namespace PathOfIrregulars.Application.Services
                 }
                 );
 
+            // kill target effect, requires a target that can be either enemy or own card, can be triggered on play
             Register(
                 "KillTarget",
                 new EffectDefinition
@@ -225,8 +231,9 @@ namespace PathOfIrregulars.Application.Services
         }
 
 
-
-    public EffectResult Execute(
+        // executes effect by id
+        // executes effect by id
+        public EffectResult Execute(
        string effectId,
        Card card,
        GameContext context,

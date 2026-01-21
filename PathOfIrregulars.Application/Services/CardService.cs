@@ -17,11 +17,15 @@ namespace PathOfIrregulars.Application.Services
 
         public EffectResult PlayCard(Card card, GameContext context, Lane? lane)
         {
+
+            // Validate card is in hand
             if (!context.ActivePlayer.Hand.Contains(card))
                 return EffectResult.Fail($"{card.Name} is not in {context.ActivePlayer.Name}'s hand.");
 
             context.ActivePlayer.Hand.Remove(card);
 
+
+            // Handle card types
             if (card.Type == CardType.Climber)
             {
                 if (lane == null)
@@ -35,15 +39,12 @@ namespace PathOfIrregulars.Application.Services
             }
             else if (card.Type == CardType.Artifact)
             {
-          
-
-               
                 context.EquipArtifact(card);
 
                 return EffectResult.Ok($"{card.Name} equipped.");
             }
 
-            // Execute effects
+            // Execute effects by going through each effect on the card
             foreach (var effect in card.CardEffects)
             {
                 var result = _registry.Execute(
@@ -71,10 +72,7 @@ namespace PathOfIrregulars.Application.Services
 
        
 
-        //public EffectResult HandleOnDeathEffects( Card card, GameContext context)
-        //{
-
-        //}
+    
 
 
     }

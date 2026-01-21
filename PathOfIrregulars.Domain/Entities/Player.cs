@@ -20,7 +20,7 @@ namespace PathOfIrregulars.Domain.Entities
             if (Deck.Count == 0)
             {
                 return null;
-                //lose game
+               
             }
             var drawnCard = Deck[0];
             Deck.RemoveAt(0);
@@ -33,8 +33,9 @@ namespace PathOfIrregulars.Domain.Entities
         {
             var rnd = new Random();
             Deck = Deck.OrderBy(x => rnd.Next()).ToList();
-        }   
+        }
 
+        // Select card to play from hand- will later take id as parameter
         public Card SelectCard()
         {
             for (int i = 0; i < Hand.Count; i++)
@@ -57,7 +58,7 @@ namespace PathOfIrregulars.Domain.Entities
 
             return Hand[selectedIndex];
         }
-
+        // Select lane to play card in
         public Lane SelectLane()
         {
             for (int i = 0; i < Lanes.Length; i++)
@@ -80,10 +81,11 @@ namespace PathOfIrregulars.Domain.Entities
         //public bool Pass()
         //{
         //    hasPassed = true;
-          
+
         //    return hasPassed;
         //}
 
+        // Calculate total power across all lanes for player
         public int CalculateTotalPower()
         {
             int totalPower = 0;
@@ -95,6 +97,7 @@ namespace PathOfIrregulars.Domain.Entities
             return totalPower;
         }
 
+        // reset player for new round
         public void Reset()
         {
             foreach (var lane in Lanes)

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace PathOfIrregulars.Domain.Entities
 {
- public class FloorTest
+
+    // TODO: Implement Floortest class
+    public class FloorTest
     {
     }
 }

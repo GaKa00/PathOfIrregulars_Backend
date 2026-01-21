@@ -12,17 +12,19 @@ namespace PathOfIrregulars.API2
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            
             builder.Services.AddAuthorization();
 
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+        
             builder.Services.AddOpenApi();
 
+            //Add card repository to Api services
             builder.Services.AddSingleton<CardRepository>(sp =>
             {
                 var env = sp.GetRequiredService<IHostEnvironment>();
                 return new CardRepository(env.ContentRootPath);
             });
+            //Add DbConnection
             builder.Services.AddDbContext<POIdbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -32,7 +34,7 @@ namespace PathOfIrregulars.API2
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            //Swagger middleware - remember to add /swagger to the url
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -43,6 +45,8 @@ namespace PathOfIrregulars.API2
 
             app.UseAuthorization();
 
+
+            // Get all cards as per Dto definition
             app.MapGet("/cards", (CardRepository cards) =>
             {
                 var result = cards.GetAll()
@@ -57,6 +61,7 @@ namespace PathOfIrregulars.API2
                 return Results.Ok(result);
             });
 
+            // Get card by id - useable in deck building etc
             app.MapGet("/cards/{id}", (string id, CardRepository cards) =>
             {
                 try
@@ -78,6 +83,10 @@ namespace PathOfIrregulars.API2
                 }
             });
 
+
+            // Account endpoints
+
+            //Get specific account, and load relevant info.
             app.MapGet("/accounts/{id}", (int id, POIdbContext db) =>
             {
                 
@@ -96,16 +105,17 @@ namespace PathOfIrregulars.API2
                     })
                     .ToList();
 
-                var dto = new AccountDto(
+                var result = new AccountDto(
                      account.Id,
                      account.Username,
                      account.Elo,
                      decksDto
                 );
 
-                return Results.Ok(dto);
+                return Results.Ok(result);
             });
 
+            // Mock account creation 
             app.MapPost("/accounts", async (string username, string password, POIdbContext db) =>
             {
                 var account = new Infrastructure.Database.Models.Account
@@ -123,6 +133,17 @@ namespace PathOfIrregulars.API2
                     new List<DeckDto>()
                 );
                 return Results.Created($"/accounts/{account.Id}", dto);
+            });
+
+
+            // Get decks for specific account
+            app.MapGet("/account{id}/decks", (int id, POIdbContext db) =>
+            {
+                var account = db.Accounts.FirstOrDefault(p => p.Id == id);
+                if (account == null)
+                    return Results.NotFound();
+                var decks = account.Decks.ToList();
+                return Results.Ok(decks);
             });
 
 

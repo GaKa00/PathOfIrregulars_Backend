@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace PathOfIrregulars.Application.Services
 {
+
+    // helper class to define effect limitations and rules
     public class EffectDefinition
     {
         public bool RequiresTarget { get; init; }

@@ -4,7 +4,7 @@
     {
 
         public int Id { get; set; }
-        public string Username { get; set; } = string.Empty;
+        public string Username { get; set; }
         public int Elo { get; set; } = 1000;
         public List<DeckDto> Decks { get; set; } = new List<DeckDto>();
     }

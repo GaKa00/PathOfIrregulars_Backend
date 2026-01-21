@@ -7,7 +7,7 @@ namespace PathOfIrregulars.API2.Contracts
      
         public string Id { get; set; } = id;
         public string Name { get; set; } = name;
-        public  CardType Type { get; set; }
+        public  CardType Type { get; set; } = type;
         public int Power { get; set; } = power;
     }
 }
