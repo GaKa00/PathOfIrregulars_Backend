@@ -29,6 +29,8 @@ namespace PathOfIrregulars.Domain.Entities
             Power += amount;
         }
 
+
+        // Calculate total power in the lane
         public int CalculateLanePower()
         {
             return CardsInLane

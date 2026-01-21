@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace PathOfIrregulars.Infrastructure.Database.Models
 {
-   public class Deck
+    public class Card
     {
+
         public int Id { get; set; }
-        public string Name { get; set; }
-        public List<Card> Cards { get; set; } = new();
+        public string CardId { get; set; }
+        public int DeckId { get; set; }
+        public int Amount { get; set; }
     }
 }

@@ -6,10 +6,14 @@ using System.Threading.Tasks;
 
 namespace PathOfIrregulars.Infrastructure.Database.Models
 {
-   public class Deck
+    public class Account
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public List<Card> Cards { get; set; } = new();
+        public string Username { get; set; }
+        public string PasswordHash { get; set; }
+        public  int Elo { get; set; } = 1000;
+
+        public List<Deck> Decks { get; set; } = new();
+
     }
 }

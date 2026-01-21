@@ -35,6 +35,7 @@ namespace PathOfIrregulars.Application
 
         public GameState GameState { get; set; }
 
+        //helper method to setup board for easier access to lanes and cards in play
         public void SetupBoard()
         {
             Board = new Board
@@ -50,7 +51,7 @@ namespace PathOfIrregulars.Application
 
         public void StartGame(Player p1, Player p2)
         {
-
+            // set initial game state
             GameState = GameState.GameStart;
             cardService = new CardService(Registry);
             PlayerOne = p1;
@@ -64,9 +65,9 @@ namespace PathOfIrregulars.Application
 
 
             p1.ShuffleDeck();
-            p2.ShuffleDeck();   
+            p2.ShuffleDeck();
 
-
+            //draw opening hands
             for (int i = 1; i < 10; i++)
             {
                 DrawCard(PlayerOne);
@@ -77,7 +78,7 @@ namespace PathOfIrregulars.Application
             }
             Log("Game started between " + PlayerOne.Name + " and " + PlayerTwo.Name);
 
-            //MulliganPhase
+            //MulliganPhase - TODO
             InitiateGameLoop();
 
         }
@@ -88,12 +89,13 @@ public void InitiateGameLoop()
 {
     StartRound();
 
-    while (true)
+            // as long as a winner hasn't been decided, keep playing turns
+            while (true)
     {
         StartTurn(ActivePlayer);
         EndTurn();
-
-        if (PlayerOne.HasPassed && PlayerTwo.HasPassed)
+                //  Check if both players have passed to end the round
+            if (PlayerOne.HasPassed && PlayerTwo.HasPassed)
         {
             EndRound();
             
@@ -112,13 +114,14 @@ public void InitiateGameLoop()
         }
     }
 }
-
-       public void InitializeFloorTest()
+        // Setup floor test - TODO
+        public void InitializeFloorTest()
         {
             floorTest = new FloorTest();
             Log("Floor test initialized.");
         }
 
+        //Randomizes starting player
         public void SetTurnOrder()
         {
             var rnd = new Random();
@@ -149,7 +152,8 @@ public void InitiateGameLoop()
 
             Log($" Total Power: {player.TotalPower}");
 
-         GameState = player == PlayerOne
+            //set game state based on active player
+            GameState = player == PlayerOne
         ? GameState.Player1Turn
         : GameState.Player2Turn;
 
@@ -167,14 +171,15 @@ public void InitiateGameLoop()
             }
 
             var cardToPlay = player.SelectCard();
+            //temporary null, is later set by player input 
             Lane? lane = null;
 
-            if (cardToPlay.Type == Domain.Enums.CardType.Climber)
+            if (cardToPlay.Type == CardType.Climber)
             {
              lane = player.SelectLane();
             }
 
-
+            //plays selected card  after lane is set
             var result = cardService.PlayCard(cardToPlay, this, lane);
 
             return;
@@ -183,18 +188,19 @@ public void InitiateGameLoop()
         }
 
         public void StartRound()
-        {
+        {// reset round state
             GameState = GameState.RoundStart;
             PlayerOne.HasPassed = false;
             PlayerTwo.HasPassed = false;
             Log("New round started.");
 
+            //trigger start of round effects
             ResolveTrigger(EffectTrigger.OnTurnStart, owner:PlayerOne);
 
            ResolveTrigger(EffectTrigger.OnTurnStart, owner: PlayerTwo);
 
 
-
+            //determine starting player
             if (PlayerOne.WonRounds > PlayerTwo.WonRounds)
             {
                 ActivePlayer = PlayerTwo;
@@ -207,7 +213,7 @@ public void InitiateGameLoop()
             {
                 SetTurnOrder();
             }
-
+            // draw cards  up to 4, or until hand has 10 cards
             for (int i = 0; i < 4; i ++)
                 {
                 if (PlayerOne.Hand.Count < 10)
@@ -220,7 +226,7 @@ public void InitiateGameLoop()
                 }
             }
 
-            //set new floor test
+            //set new floor test - todo
           
 
 
@@ -292,7 +298,7 @@ public void InitiateGameLoop()
             HasGameEnded = true;
         }
 
-
+        // utility method to get adjacent cards in a lane
         public static List<Card> GetAdjacentCards(Card card, Lane lane) {
 
             var cards = lane.CardsInLane;
@@ -316,6 +322,7 @@ public void InitiateGameLoop()
 
         }
 
+        // Resets the field by clearing lanes and destroying cards in play
         public void ResetField()
         {
 
@@ -355,7 +362,7 @@ public void InitiateGameLoop()
         }
 
 
-
+        // Equip artifact to climber
         public void EquipArtifact(Card artifact)
         {
             Log($"CardEffects count: {artifact.CardEffects.Count}");
@@ -427,7 +434,7 @@ public void InitiateGameLoop()
 
 
 
-
+        // Deprecated - use Player.DrawCard instead
         public Card DrawCard(Player player)
         {
             if (player.Deck.Count == 0)

@@ -15,7 +15,7 @@ namespace PathOfIrregulars.Domain.Entities
         public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-
+        // Use JsonStringEnumConverter to serialize/deserialize enum as string
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public CardType Type { get; set; }
 
@@ -28,6 +28,7 @@ namespace PathOfIrregulars.Domain.Entities
         
         public bool IsUntargetable { get; set; } = false;
 
+        // Effects associated with the card , needed for serialization
         [JsonPropertyName("Effects")]
         public List<CardEffect> CardEffects { get; set; } = new();
 
@@ -36,6 +37,7 @@ namespace PathOfIrregulars.Domain.Entities
          
                 Power += amount;
         }
+
 
         public void DecreasePower(int amount)
         {

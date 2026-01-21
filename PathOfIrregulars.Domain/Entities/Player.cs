@@ -1,10 +1,8 @@
 ﻿
-using PathOfIrregulars.Domain.Enums;
-
 namespace PathOfIrregulars.Domain.Entities
 
 {
-    public class Player
+  public class Player
     {
         public string Name { get; set; }
         public List<Card> Hand { get; set; }
@@ -17,20 +15,17 @@ namespace PathOfIrregulars.Domain.Entities
         public int WonRounds { get; set; } = 0;
         public bool HasPassed { get; set; }
 
-
-
-
         public Card DrawCard()
         {
             if (Deck.Count == 0)
             {
-             throw new InvalidOperationException("Cannot draw a card from an empty deck.");
-
+                return null;
+               
             }
             var drawnCard = Deck[0];
             Deck.RemoveAt(0);
             Hand.Add(drawnCard);
-
+       
             return drawnCard;
         }
 
@@ -40,6 +35,7 @@ namespace PathOfIrregulars.Domain.Entities
             Deck = Deck.OrderBy(x => rnd.Next()).ToList();
         }
 
+        // Select card to play from hand- will later take id as parameter
         public Card SelectCard()
         {
             for (int i = 0; i < Hand.Count; i++)
@@ -51,7 +47,7 @@ namespace PathOfIrregulars.Domain.Entities
 
             int selectedIndex;
 
-
+          
             string? input = Console.ReadLine();
 
             while (!int.TryParse(input, out selectedIndex) || selectedIndex < 0 || selectedIndex >= Hand.Count)
@@ -62,7 +58,7 @@ namespace PathOfIrregulars.Domain.Entities
 
             return Hand[selectedIndex];
         }
-
+        // Select lane to play card in
         public Lane SelectLane()
         {
             for (int i = 0; i < Lanes.Length; i++)
@@ -89,6 +85,7 @@ namespace PathOfIrregulars.Domain.Entities
         //    return hasPassed;
         //}
 
+        // Calculate total power across all lanes for player
         public int CalculateTotalPower()
         {
             int totalPower = 0;
@@ -100,6 +97,7 @@ namespace PathOfIrregulars.Domain.Entities
             return totalPower;
         }
 
+        // reset player for new round
         public void Reset()
         {
             foreach (var lane in Lanes)
@@ -110,31 +108,11 @@ namespace PathOfIrregulars.Domain.Entities
                 }
 
                 lane.CardsInLane.Clear();
-
+              
             }
 
             HasPassed = false;
         }
 
-    
-
-
-    public Player(string name, List<Card> deck)
-        {
-            Name = name;
-
-            Deck = deck;
-            Hand = new List<Card>();
-            Graveyard = new List<Card>();
-
-            Lanes = new[]
-            {
-        new Lane(LaneType.Vanguard),
-        new Lane(LaneType.Midrange),
-        new Lane(LaneType.Backline)
-    };
-
-            ShuffleDeck();
-        }
     }
 }

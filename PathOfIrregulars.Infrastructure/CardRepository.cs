@@ -15,15 +15,20 @@ namespace PathOfIrregulars.Infrastructure.Persistence
     {
         private Dictionary<string, Card> _cardsById;
 
-        public CardRepository(string jsonPath = "cards.json")
+        public CardRepository(string contentRootPath)
         {
+            var jsonPath = Path.Combine(contentRootPath, "cards.json");
             LoadCardsFromJson(jsonPath);
         }
 
         private void LoadCardsFromJson(string jsonPath)
         {
             if (!File.Exists(jsonPath))
-                throw new FileNotFoundException($"cards.json not found at: {jsonPath}");
+            {
+                // log error instead of throwing to include actionable message
+                throw new FileNotFoundException($"cards.json not found at: {jsonPath}. Ensure 'cards.json' is in the project and copied to output (csproj: <Content Include=\"cards.json\"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>).");
+
+            }
 
             string json = File.ReadAllText(jsonPath);
 
