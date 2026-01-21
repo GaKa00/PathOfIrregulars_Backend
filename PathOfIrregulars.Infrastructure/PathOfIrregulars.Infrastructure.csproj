@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PathOfIrregulars.Application\PathOfIrregulars.Application.csproj" />
     <ProjectReference Include="..\PathOfIrregulars.Domain\PathOfIrregulars.Domain.csproj" />
+	  <ProjectReference Include="..\PathOfIrregulars.Application\PathOfIrregulars.API2.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
