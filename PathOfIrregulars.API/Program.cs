@@ -1,8 +1,9 @@
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using PathOfIrregulars.API.Contracts;
+using PathOfIrregulars.Application;
 using PathOfIrregulars.Application.Services;
+using PathOfIrregulars.Application.Services.PathOfIrregulars.Application.Services;
 using PathOfIrregulars.Domain.Entities;
 using PathOfIrregulars.Infrastructure.Database.Data;
 using PathOfIrregulars.Infrastructure.Database.Models;
@@ -210,10 +211,44 @@ namespace PathOfIrregulars.API
 
 
             // create a new match, todo
-            //app.MapPost("/Matches", (int p1, int p2, Deck deck1, Deck deck2, POIdbContext db) =>
-            //{
+            app.MapPost("/Matches", (int p1, int p2, Deck deck1, Deck deck2, POIdbContext db) =>
+            {
+                var context = new GameContext();
+                var transformer = new PlayerFactory();
 
-            //});
+                var Account1 = db.Accounts.FirstOrDefault(a => a.Id == p1);
+                var Account2 = db.Accounts.FirstOrDefault(a => a.Id == p2);
+
+                var player1 = null;
+                var player2 = null;
+
+
+                var player1Deck = db.Decks.FirstOrDefault(d => d.AccountId == p1);
+                if (player1Deck != null)
+                {
+                  player1 = transformer.Create(Account1.Username, deck1.Cards);
+                }
+                else
+                {
+                    return Results.NotFound("Player 1 Deck not found");
+                }
+
+                var player2Deck = db.Decks.FirstOrDefault(d => d.AccountId == p2);
+                if (player2Deck != null)
+                {
+                    player2 = transformer.Create(Account2.Username, deck2.Cards);
+                }
+                else
+                {
+                    return Results.NotFound("Player 2 Deck not found");
+                }
+
+                context.StartGame(player1, player2);
+
+                
+
+
+            });
 
 
 
