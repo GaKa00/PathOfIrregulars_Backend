@@ -1,6 +1,6 @@
 ﻿using PathOfIrregulars.Domain.Enums;
 
-namespace PathOfIrregulars.API2.Contracts
+namespace PathOfIrregulars.API.Contracts
 {
     public class CardDto(string id, string name, CardType type, int power)
     {

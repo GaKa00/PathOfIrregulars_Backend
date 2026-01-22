@@ -1,4 +1,4 @@
-﻿namespace PathOfIrregulars.API2.Contracts
+﻿namespace PathOfIrregulars.API.Contracts
 {
     public class DeckDto
     {

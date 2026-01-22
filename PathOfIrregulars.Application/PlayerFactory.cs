@@ -20,15 +20,15 @@ namespace PathOfIrregulars.Application.Services
                 _cards = cards;
             }
 
-            public Player Create(AccountDto account, DeckDto deck)
-            {
+            //public Player Create(AccountDto account, DeckDto deck)
+            //{
 
-                var deckCards = deck.CardIds
-                    .Select(id => _cards.GetCard(id))
-                    .ToList();
+            //    var deckCards = deck.CardIds
+            //        .Select(id => _cards.GetCard(id))
+            //        .ToList();
 
-                return new Player(account.Username, deckCards);
-            }
+            //    return new Player(account.Username, deckCards);
+            //}
         }
     }
 

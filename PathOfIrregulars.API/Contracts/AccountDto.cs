@@ -1,4 +1,4 @@
-﻿namespace PathOfIrregulars.API2.Contracts
+﻿namespace PathOfIrregulars.API.Contracts
 {
     public class AccountDto ( int id, string username, int elo, List<DeckDto> decks)
     {
