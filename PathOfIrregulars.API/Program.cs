@@ -72,7 +72,7 @@ namespace PathOfIrregulars.API
                 try
                 {
 
-                    var card = cards.GetCardById(id);
+                    var card =  cards.GetCardById(id);
 
                     var result = new CardDto(
                         card.Id,
@@ -92,12 +92,12 @@ namespace PathOfIrregulars.API
             // Account endpoints
 
             //Get specific account, and load relevant info.
-            app.MapGet("/accounts/{id}", (int id, POIdbContext db) =>
+            app.MapGet("/accounts/{id}", async (int id, POIdbContext db) =>
             {
                 
-                var account = db.Accounts
+                var account =  await db.Accounts
                                 .Include(a => a.Decks)
-                                .FirstOrDefault(p => p.Id == id);
+                                .FirstOrDefaultAsync(p => p.Id == id);
 
                 if (account == null)
                     return Results.NotFound();
@@ -150,9 +150,9 @@ namespace PathOfIrregulars.API
 
 
             // Get decks for specific account
-            app.MapGet("/account/{id}/decks", (int id, POIdbContext db) =>
+            app.MapGet("/account/{id}/decks", async (int id, POIdbContext db) =>
             {
-                var account = db.Accounts.FirstOrDefault(p => p.Id == id);
+                var account =  await db.Accounts.FirstOrDefaultAsync(p => p.Id == id);
                 if (account == null)
                     return Results.NotFound();
                 var decks = account.Decks.ToList();
@@ -160,15 +160,15 @@ namespace PathOfIrregulars.API
             });
 
             //create a deck for user
-            app.MapPost("/accounts/{id}/decks",
+            app.MapPost("/accounts/{id}/decks", async
                 (int id,
                  CreateDeckDto dto,
                  POIdbContext db,
                  CardRepository cards) =>
                 {
-                    var account = db.Accounts
+                    var account = await  db.Accounts
             .Include(a => a.Decks)
-            .FirstOrDefault(a => a.Id == id);
+            .FirstOrDefaultAsync(a => a.Id == id);
 
                     if (account == null)
                         return Results.NotFound("Account not found");
@@ -201,7 +201,7 @@ namespace PathOfIrregulars.API
                     };
 
                     account.Decks.Add(deck);
-                    db.SaveChanges();
+                    await db.SaveChangesAsync();
 
                     return Results.Created(
             $"/accounts/{account.Id}/decks/{deck.Id}",
