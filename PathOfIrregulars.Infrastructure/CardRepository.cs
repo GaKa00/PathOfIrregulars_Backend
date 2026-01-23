@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using PathOfIrregulars.Domain.Entities;
-using PathOfIrregulars.Application.Contracts;
+
 
 
 namespace PathOfIrregulars.Infrastructure.Persistence
@@ -11,7 +11,7 @@ namespace PathOfIrregulars.Infrastructure.Persistence
         public List<Card> Cards { get; set; } = new();
     }
 
-    public class CardRepository : ICardRepository
+    public class CardRepository 
     {
         private Dictionary<string, Card> _cardsById;
 

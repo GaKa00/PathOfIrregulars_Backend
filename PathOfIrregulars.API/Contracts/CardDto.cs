@@ -2,12 +2,23 @@
 
 namespace PathOfIrregulars.API.Contracts
 {
-    public class CardDto(string id, string name, CardType type, int power)
+public class CardDto
     {
-     
-        public string Id { get; set; } = id;
-        public string Name { get; set; } = name;
-        public  CardType Type { get; set; } = type;
-        public int Power { get; set; } = power;
+public CardDto() { }
+
+    public CardDto(string id, string name, CardType type, int power)
+    {
+        Id = id ?? string.Empty;
+        Name = name ?? string.Empty;
+        Type = type;
+        Power = power;
     }
+
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public CardType Type { get; set; }
+    public int Power { get; set; }
+
+        }
+    
 }

@@ -125,6 +125,16 @@ namespace PathOfIrregulars.API
               CreateAccountDto dto,
               POIdbContext db) =>
             {
+                if (dto == null)
+                    return Results.BadRequest("Request body is required.");
+
+                if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
+                    return Results.BadRequest("Username and Password are required.");
+
+                var usernameExists = await db.Accounts.AnyAsync(a => a.Username == dto.Username);
+                if (usernameExists)
+                    return Results.Conflict($"Username '{dto.Username}' already exists.");
+
                 var account = new Account
                 {
                     Username = dto.Username,
@@ -210,45 +220,45 @@ namespace PathOfIrregulars.API
                 });
 
 
-            // create a new match, todo
-            app.MapPost("/Matches", (int p1, int p2, Deck deck1, Deck deck2, POIdbContext db) =>
-            {
-                var context = new GameContext();
-                var transformer = new PlayerFactory();
+            //// create a new match, todo
+            //app.MapPost("/Matches", (int p1, int p2, Deck deck1, Deck deck2, POIdbContext db) =>
+            //{
+            //    var context = new GameContext();
+            //    var transformer = new PlayerFactory();
 
-                var Account1 = db.Accounts.FirstOrDefault(a => a.Id == p1);
-                var Account2 = db.Accounts.FirstOrDefault(a => a.Id == p2);
+            //    var Account1 = db.Accounts.FirstOrDefault(a => a.Id == p1);
+            //    var Account2 = db.Accounts.FirstOrDefault(a => a.Id == p2);
 
-                var player1 = null;
-                var player2 = null;
+            //    var player1 = null;
+            //    var player2 = null;
 
 
-                var player1Deck = db.Decks.FirstOrDefault(d => d.AccountId == p1);
-                if (player1Deck != null)
-                {
-                  player1 = transformer.Create(Account1.Username, deck1.Cards);
-                }
-                else
-                {
-                    return Results.NotFound("Player 1 Deck not found");
-                }
+            //    var player1Deck = db.Decks.FirstOrDefault(d => d.AccountId == p1);
+            //    if (player1Deck != null)
+            //    {
+            //      player1 = transformer.Create(Account1.Username, deck1.Cards);
+            //    }
+            //    else
+            //    {
+            //        return Results.NotFound("Player 1 Deck not found");
+            //    }
 
-                var player2Deck = db.Decks.FirstOrDefault(d => d.AccountId == p2);
-                if (player2Deck != null)
-                {
-                    player2 = transformer.Create(Account2.Username, deck2.Cards);
-                }
-                else
-                {
-                    return Results.NotFound("Player 2 Deck not found");
-                }
+            //    var player2Deck = db.Decks.FirstOrDefault(d => d.AccountId == p2);
+            //    if (player2Deck != null)
+            //    {
+            //        player2 = transformer.Create(Account2.Username, deck2.Cards);
+            //    }
+            //    else
+            //    {
+            //        return Results.NotFound("Player 2 Deck not found");
+            //    }
 
-                context.StartGame(player1, player2);
+            //    context.StartGame(player1, player2);
 
                 
 
 
-            });
+            //});
 
 
 
