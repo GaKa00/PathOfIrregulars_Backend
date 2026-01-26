@@ -1,5 +1,4 @@
-﻿
-using PathOfIrregulars.Application.Services;
+﻿using PathOfIrregulars.Application.Services;
 using PathOfIrregulars.Domain.Entities;
 using PathOfIrregulars.Domain.Enums;
 using System.Data.Common;
@@ -9,7 +8,7 @@ using System.Numerics;
 
 namespace PathOfIrregulars.Application
 {
-    public class GameContext
+    public class Match
     {
 
         public List<string> Logs { get; private set; } = new();
@@ -21,19 +20,19 @@ namespace PathOfIrregulars.Application
 
         public int TurnCount { get; private set; } = 1;
 
-        public Card? TargetCard { get; set; }
 
-        public bool HasGameEnded { get; private set; } = false;
+        public GameState GameState { get; set; }
         public Player? Winner { get; private set; }
+        public bool HasGameEnded { get; private set; } = false;
+        public Board Board { get;  private set; }
 
         public FloorTest floorTest { get; set; }
+        public Card? TargetCard { get; set; }
       
         private EffectRegistry Registry { get; set; } = new EffectRegistry();
 
         private CardService cardService { get; set; }
-        public Board Board { get;  private set; }
 
-        public GameState GameState { get; set; }
 
         //helper method to setup board for easier access to lanes and cards in play
         public void SetupBoard()
@@ -57,11 +56,7 @@ namespace PathOfIrregulars.Application
             PlayerOne = p1;
             PlayerTwo = p2;
             SetupBoard();
-
-
-
-   
-      
+            SetTurnOrder();
 
 
             p1.ShuffleDeck();
@@ -70,16 +65,16 @@ namespace PathOfIrregulars.Application
             //draw opening hands
             for (int i = 1; i < 10; i++)
             {
-                DrawCard(PlayerOne);
+              PlayerOne.DrawCard();
                 Log("p1 " + PlayerOne.Hand.Count);
 
-                DrawCard(PlayerTwo);
+              PlayerTwo.DrawCard();
                 Log("p2" + PlayerTwo.Hand.Count);
             }
             Log("Game started between " + PlayerOne.Name + " and " + PlayerTwo.Name);
 
             //MulliganPhase - TODO
-            InitiateGameLoop();
+            //InitiateGameLoop();
 
         }
 
@@ -134,7 +129,6 @@ public void InitiateGameLoop()
             {
                 ActivePlayer = PlayerTwo;
             }
-
         }
 
         public void StartTurn(Player player)
@@ -144,12 +138,7 @@ public void InitiateGameLoop()
                 Log($"It's not {player.Name}'s turn.");
                 return;
             }
-
-
             Log($"Turn {TurnCount} started for {player.Name}");
-
-       
-
             Log($" Total Power: {player.TotalPower}");
 
             //set game state based on active player
@@ -158,34 +147,60 @@ public void InitiateGameLoop()
         : GameState.Player2Turn;
 
 
-            //temporary pass, will later make into a own api call (TODO)
-            Console.WriteLine("Would you like to Pass?");
-            var input = Console.ReadLine();
-            if (input != null && input.ToLower() == "pass")
-            {
-                player.HasPassed = true;
-                Log($"{player.Name} has passed.");
-               
-               EndTurn();
-                return;
-            }
+            
 
-            var cardToPlay = player.SelectCard();
-            //temporary null, is later set by player input 
-            Lane? lane = null;
+            //var cardToPlay = player.SelectCard();
+            ////temporary null, is later set by player input 
+            //Lane? lane = null;
 
-            if (cardToPlay.Type == CardType.Climber)
-            {
-             lane = player.SelectLane();
-            }
+            //if (cardToPlay.Type == CardType.Climber)
+            //{
+            // lane = player.SelectLane();
+            //}
 
-            //plays selected card  after lane is set
-            var result = cardService.PlayCard(cardToPlay, this, lane);
+            ////plays selected card  after lane is set
+            //var result = cardService.PlayCard(cardToPlay, this, lane);
 
             return;
-
-
         }
+
+    public void Playcard(string playerName, string cardId, string? laneId, string? targetCardId)
+        {
+            var player = playerName == PlayerOne.Name ? PlayerOne : PlayerTwo;
+            if (player != ActivePlayer)
+            {
+                Log($"It's not {player.Name}'s turn.");
+                return;
+            }
+            var cardToPlay = player.Hand.FirstOrDefault(c => c.Id == cardId);
+            if (cardToPlay == null)
+            {
+                Log($"{player.Name} does not have card with ID {cardId} in hand.");
+                return;
+            }
+            Lane? lane = null;
+        
+                if (Enum.TryParse<LaneType>(laneId, out var parsedLaneType))
+                {
+                    lane = player.Lanes.FirstOrDefault(l => l.LaneType == parsedLaneType);
+                    if (lane == null)
+                    {
+                        Log($"{player.Name} does not have lane with ID {laneId}.");
+                        return;
+                    }
+                }
+                else
+                {
+                    Log($"{laneId} is not a valid LaneType.");
+                    return;
+                }
+
+                var targetCard = targetCardId != null ? Board.CardsInPlay.FirstOrDefault(c => c.Id == targetCardId) : null;
+                var result = cardService.PlayCard(cardToPlay, this, lane, targetCard);
+
+            }
+
+        
 
         public void StartRound()
         {// reset round state
@@ -218,21 +233,15 @@ public void InitiateGameLoop()
                 {
                 if (PlayerOne.Hand.Count < 10)
                 {
-                    DrawCard(PlayerOne);
+                    PlayerOne.DrawCard();
                 }
                 if (PlayerTwo.Hand.Count < 10)
                 {
-                    DrawCard(PlayerTwo);
+                    PlayerTwo.DrawCard();
                 }
             }
 
             //set new floor test - todo
-          
-
-
-
-
-
         }
 
         public void EndTurn()
@@ -298,29 +307,9 @@ public void InitiateGameLoop()
             HasGameEnded = true;
         }
 
-        // utility method to get adjacent cards in a lane
-        public static List<Card> GetAdjacentCards(Card card, Lane lane) {
 
-            var cards = lane.CardsInLane;
-            var index = cards.IndexOf(card);
-            var adjacentCards = new List<Card>();
 
-            if ( index == -1)
-            {
-                return cards;
-            }
 
-            if (index > 0)
-            {
-                adjacentCards.Add(cards[index - 1]);
-            }
-            if (index < cards.Count - 1)
-            {
-                adjacentCards.Add(cards[index + 1]);
-            }
-            return cards;
-
-        }
 
         // Resets the field by clearing lanes and destroying cards in play
         public void ResetField()
@@ -329,6 +318,12 @@ public void InitiateGameLoop()
             PlayerOne.Reset();
             PlayerTwo.Reset();
           
+        }
+
+        public void Pass(Player player)
+        {
+            player.HasPassed = true;
+            Log($"{player.Name} has passed their turn.");
         }
 
 
@@ -363,11 +358,11 @@ public void InitiateGameLoop()
 
 
         // Equip artifact to climber
-        public void EquipArtifact(Card artifact)
+        public void EquipArtifact(Card artifact, Card target)
         {
-            Log($"CardEffects count: {artifact.CardEffects.Count}");
-            SelectTargetCard();
-            var targetClimber = this.TargetCard;
+      
+            
+            var targetClimber = target;
 
             if (targetClimber == null)
             {
@@ -387,6 +382,29 @@ public void InitiateGameLoop()
                 Registry.Execute(effect.EffectId, artifact, this, effect.GetAmount());
             }
         }
+        // utility method to get adjacent cards in a lane
+        public static List<Card> GetAdjacentCards(Card card, Lane lane) {
+
+            var cards = lane.CardsInLane;
+            var index = cards.IndexOf(card);
+            var adjacentCards = new List<Card>();
+
+            if ( index == -1)
+            {
+                return cards;
+            }
+
+            if (index > 0)
+            {
+                adjacentCards.Add(cards[index - 1]);
+            }
+            if (index < cards.Count - 1)
+            {
+                adjacentCards.Add(cards[index + 1]);
+            }
+            return cards;
+
+        }
 
         //public void HandleCardDeathEffect(Card card)
         //{
@@ -399,60 +417,38 @@ public void InitiateGameLoop()
         //}
 
         // CARD FUNCTIONS
-        public void SelectTargetCard()
-        {
+        //public void SelectTargetCard()
+        //{
 
            
-            foreach (var c in Board.CardsInPlay)
-                Console.WriteLine($"{c.Name} - ID: {c.Id}");
+        //    foreach (var c in Board.CardsInPlay)
+        //        Console.WriteLine($"{c.Name} - ID: {c.Id}");
 
-            Console.WriteLine("Enter the ID of the card you want to target:");
+        //    Console.WriteLine("Enter the ID of the card you want to target:");
 
-            while (true)
-            {
-                var input = Console.ReadLine()?.Trim();
+        //    while (true)
+        //    {
+        //        var input = Console.ReadLine()?.Trim();
 
-                if (string.IsNullOrWhiteSpace(input))
-                {
-                    Log("Invalid input. Enter a valid card ID.");
-                    continue;
-                }
+        //        if (string.IsNullOrWhiteSpace(input))
+        //        {
+        //            Log("Invalid input. Enter a valid card ID.");
+        //            continue;
+        //        }
 
-                var card = Board.CardsInPlay.FirstOrDefault(c => c.Id == input);
+        //        var card = Board.CardsInPlay.FirstOrDefault(c => c.Id == input);
 
-                if (card == null)
-                {
-                    Log("No card found with that ID. Try again.");
-                    continue;
-                }
+        //        if (card == null)
+        //        {
+        //            Log("No card found with that ID. Try again.");
+        //            continue;
+        //        }
 
-                TargetCard = card;
-                Log($"{card.Name} has been targeted.");
-                break;
-            }
-        }
-
-
-
-        // Deprecated - use Player.DrawCard instead
-        public Card DrawCard(Player player)
-        {
-            if (player.Deck.Count == 0)
-            {
-                Log("Deck is empty. Cannot draw a card.");
-               
-                return null;
-            }
-            var drawnCard = player.Deck[0];
-            player.Deck.RemoveAt(0);
-            player.Hand.Add(drawnCard);
-            Log($"{drawnCard.Name} drawn to hand.");
-            return drawnCard;
-        }
-
-
-     
-
+        //        TargetCard = card;
+        //        Log($"{card.Name} has been targeted.");
+        //        break;
+        //    }
+        //}
         
         public void Log(string message)
         {

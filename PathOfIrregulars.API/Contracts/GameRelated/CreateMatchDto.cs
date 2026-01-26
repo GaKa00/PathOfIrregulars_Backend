@@ -1,6 +1,6 @@
 ﻿using PathOfIrregulars.Application;
 
-namespace PathOfIrregulars.API.Contracts
+namespace PathOfIrregulars.API.Contracts.GameRelated
 {
     public class CreateMatchDto
     {

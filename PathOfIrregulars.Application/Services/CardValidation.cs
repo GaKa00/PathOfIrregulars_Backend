@@ -4,7 +4,7 @@ namespace PathOfIrregulars.Application.Services
 {
     internal class CardValidation
     {
-        public static bool ValidatePlay(Card card, GameContext context, Lane lane)
+        public static bool ValidatePlay(Card card, Match context, Lane lane)
         {
             //check if activeplayer played card
 
@@ -53,7 +53,7 @@ namespace PathOfIrregulars.Application.Services
         public static bool ValidateTarget(
             Card sourceCard,
             Card? targetCard,
-            GameContext context
+            Match context
         )
         {
             //Target must exist
@@ -89,7 +89,7 @@ namespace PathOfIrregulars.Application.Services
           CardEffect effect,
           Card sourceCard,
           Card? targetCard,
-          GameContext context,
+          Match context,
           EffectRegistry registry
       )
         {
@@ -147,7 +147,7 @@ namespace PathOfIrregulars.Application.Services
         }
 
 
-        public static bool ValidateGameState(GameContext context)
+        public static bool ValidateGameState(Match context)
         {
 
             //check that game is not over

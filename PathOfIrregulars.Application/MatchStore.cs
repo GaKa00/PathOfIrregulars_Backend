@@ -8,7 +8,9 @@ namespace PathOfIrregulars.Application
 {
     // will track ongoing matches, take reponsibility for starting, updating , and ending matches - todo
 
-    internal class MatchStore
+   public class MatchStore
     {
+
+        public static Dictionary<Guid, Match> OngoingMatches { get; } = new Dictionary<Guid, Match>();
     }
 }

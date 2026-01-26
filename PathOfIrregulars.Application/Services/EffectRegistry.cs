@@ -1,4 +1,5 @@
-﻿using PathOfIrregulars.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PathOfIrregulars.Domain.Entities;
 using PathOfIrregulars.Domain.Enums;
 using PathOfIrregulars.Domain.ValueObjects;
 using System;
@@ -12,7 +13,7 @@ namespace PathOfIrregulars.Application.Services
    public class EffectRegistry
     {
 
-        private readonly Dictionary<string, Func<Card, GameContext, int?, EffectResult>> _executors;
+        private readonly Dictionary<string, Func<Card, Match, int?,  Card?, EffectResult>> _executors;
 
        
         private readonly Dictionary<string, EffectDefinition> _definitions;
@@ -39,7 +40,7 @@ namespace PathOfIrregulars.Application.Services
         // helper method to register effects into the registry
         private void Register(string id,
             EffectDefinition definition,
-            Func<Card, GameContext, int?, EffectResult> executor)
+            Func<Card, Match, int?, Card?, EffectResult> executor)
         {
             _executors[id] = executor;
             _definitions[id] = definition;
@@ -59,7 +60,7 @@ namespace PathOfIrregulars.Application.Services
                      AllowedTriggers = { EffectTrigger.OnPlay },
                      MaxAmount = 5
                  },
-                 (card, context, amount) =>
+                 (card, context, amount, target) =>
                  {
                      int drawCount = amount ?? 1;
 
@@ -84,11 +85,9 @@ namespace PathOfIrregulars.Application.Services
                           IsCancelable = true,
                           MaxAmount = 100
                       },
-                      (card, context, damage) =>
+                      (card, context, damage, target) =>
                         {
-                            context.SelectTargetCard();
-                            var target = context.TargetCard;
-
+                            
                             if (target == null)
                                 return EffectResult.Fail("No target selected.");
 
@@ -121,16 +120,15 @@ namespace PathOfIrregulars.Application.Services
                     IsCancelable = true,
                     MaxAmount = 100
                 },
-                (card, context, buffAmount) =>
+                (card, context, buffAmount, target) =>
                 {
-                    context.SelectTargetCard();
-                    var targetCard = context.TargetCard;
-                    if (targetCard == null)
+                    
+                    if (target == null)
                     {
                         return EffectResult.Fail("No target selected for BuffCard effect.");
                     }
-                    targetCard.IncreasePower(buffAmount ?? 1);
-                    return EffectResult.Ok($"{card.Name} buffed {targetCard.Name} by {buffAmount}.");
+                    target.IncreasePower(buffAmount ?? 1);
+                    return EffectResult.Ok($"{card.Name} buffed {target.Name} by {buffAmount}.");
                 }
                 );
             // deal damage to self effect, cannot target other cards, can be triggered on play or turn start (typically a setback for big power cards)
@@ -142,7 +140,7 @@ namespace PathOfIrregulars.Application.Services
                     AllowedTriggers = { EffectTrigger.OnPlay, EffectTrigger.OnTurnStart },
                     MaxAmount = 100
                 },
-                (card, context, damage) =>
+                (card, context, damage, target) =>
                 {
                     if (!card.HasPower)
                     {
@@ -171,9 +169,9 @@ namespace PathOfIrregulars.Application.Services
                     AllowedTriggers = { EffectTrigger.OnPlay, EffectTrigger.OnTurnStart },
                     MaxAmount = 100
                 },
-                (card, context, buffAmount) =>
+                (card, context, buffAmount, target) =>
              {
-                 if (card.Type != Domain.Enums.CardType.Climber)
+                 if (card.Type != CardType.Climber)
                  {
                      return EffectResult.Fail($"{card.Name} is not a Climber, and therefore can't gain power.");
                  }
@@ -191,16 +189,15 @@ namespace PathOfIrregulars.Application.Services
                     AllowedTriggers = { EffectTrigger.OnPlay },
                     MaxAmount = 100
                 },
-                (card, context, healAmount) =>
+                (card, context, healAmount, target) =>
                 {
-                    context.SelectTargetCard();
-                    var targetCard = context.TargetCard;
-                    if (targetCard == null)
+                 
+                    if (target == null)
                     {
                         return EffectResult.Fail("No target selected for HealTarget effect.");
                     }
-                    targetCard.IncreasePower(healAmount ?? 1);
-                    return EffectResult.Ok($"{card.Name} healed {targetCard.Name} by {healAmount}.");
+                    target.IncreasePower(healAmount ?? 1);
+                    return EffectResult.Ok($"{card.Name} healed {target.Name} by {healAmount}.");
                 }
                 );
 
@@ -213,10 +210,9 @@ namespace PathOfIrregulars.Application.Services
                     AllowedTriggers = { EffectTrigger.OnPlay },
                     MaxAmount = null
                 },
-                (card, context, _) =>
+                (card, context, _, target) =>
                 {
-                    context.SelectTargetCard();
-                    var target = context.TargetCard;
+                   ;
                     if (target == null)
                         return EffectResult.Fail("No target selected.");
                     var lane = context.Opponent.Lanes.FirstOrDefault(l => l.CardsInLane.Contains(target));
@@ -230,21 +226,21 @@ namespace PathOfIrregulars.Application.Services
                 );
         }
 
-
-        // executes effect by id
         // executes effect by id
         public EffectResult Execute(
        string effectId,
        Card card,
-       GameContext context,
-       int? value = null
+       Match context,
+       int? value = null,
+       Card? targetCard = null
    )
     {
         if (!_executors.TryGetValue(effectId, out var effectFunc))
             return EffectResult.Fail($"Effect '{effectId}' not found.");
 
-        return effectFunc(card, context, value);
+        return effectFunc(card, context, value , targetCard);
     }
+
 
         public bool Has(string effectId)
         {

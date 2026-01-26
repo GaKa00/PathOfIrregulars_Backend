@@ -15,7 +15,7 @@ namespace PathOfIrregulars.Application.Services
 
         public CardService(EffectRegistry registry) => _registry = registry;
 
-        public EffectResult PlayCard(Card card, GameContext context, Lane? lane)
+        public EffectResult PlayCard(Card card, Match context, Lane? lane, Card? target)
         {
 
             // Validate card is in hand
@@ -39,7 +39,7 @@ namespace PathOfIrregulars.Application.Services
             }
             else if (card.Type == CardType.Artifact)
             {
-                context.EquipArtifact(card);
+                context.EquipArtifact(card, target);
 
                 return EffectResult.Ok($"{card.Name} equipped.");
             }
@@ -51,7 +51,8 @@ namespace PathOfIrregulars.Application.Services
                     effect.EffectId,
                     card,
                     context,
-                    effect.GetAmount()
+                    effect.GetAmount(),
+                    target
                 );
 
                 context.Log(result.Message);

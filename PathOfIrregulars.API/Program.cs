@@ -1,13 +1,16 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Client;
 using PathOfIrregulars.API.Contracts;
+using PathOfIrregulars.API.Contracts.GameRelated;
 using PathOfIrregulars.Application;
 using PathOfIrregulars.Application.Services;
-using PathOfIrregulars.Application.Services.PathOfIrregulars.Application.Services;
+
 using PathOfIrregulars.Domain.Entities;
 using PathOfIrregulars.Infrastructure.Database.Data;
 using PathOfIrregulars.Infrastructure.Database.Models;
 using PathOfIrregulars.Infrastructure.Persistence;
+using System.Text.RegularExpressions;
 
 namespace PathOfIrregulars.API
 {
@@ -220,45 +223,58 @@ namespace PathOfIrregulars.API
                 });
 
 
-            //// create a new match, todo
-            //app.MapPost("/Matches", (int p1, int p2, Deck deck1, Deck deck2, POIdbContext db) =>
-            //{
-            //    var context = new GameContext();
-            //    var transformer = new PlayerFactory();
+        
 
-            //    var Account1 = db.Accounts.FirstOrDefault(a => a.Id == p1);
-            //    var Account2 = db.Accounts.FirstOrDefault(a => a.Id == p2);
-
-            //    var player1 = null;
-            //    var player2 = null;
+            app.MapPost("/matches", async (CreateMatchDto data, POIdbContext db) =>
+            {
 
 
-            //    var player1Deck = db.Decks.FirstOrDefault(d => d.AccountId == p1);
-            //    if (player1Deck != null)
-            //    {
-            //      player1 = transformer.Create(Account1.Username, deck1.Cards);
-            //    }
-            //    else
-            //    {
-            //        return Results.NotFound("Player 1 Deck not found");
-            //    }
+                var account1 =  await db.Accounts.FindAsync(data.playerOneId);
+                var account2 = await db.Accounts.FindAsync(data.playerTwoId);
 
-            //    var player2Deck = db.Decks.FirstOrDefault(d => d.AccountId == p2);
-            //    if (player2Deck != null)
-            //    {
-            //        player2 = transformer.Create(Account2.Username, deck2.Cards);
-            //    }
-            //    else
-            //    {
-            //        return Results.NotFound("Player 2 Deck not found");
-            //    }
 
-            //    context.StartGame(player1, player2);
+                if ( account1 == null || account2 == null)
+                {
+                    return Results.NotFound("Accounts could not be retrieved.");
+                }
+                //add check for decks existing?
 
-                
+                var deck1 = await db.Decks.Include(d => d.Cards).FirstOrDefaultAsync(d => d.Id == data.playerOneDeck.Id && d.AccountId == account1.Id);
+
+                var deck2 =  await db.Decks.Include(d => d.Cards).FirstOrDefaultAsync(d => d.Id == data.playerTwoDeck.Id && d.AccountId == account2.Id);
+
+                if (deck1 == null || deck2 == null)
+                {
+                    return Results.NotFound("Decks could not be retrieved.");
+                }
+
+                var context = new Application.Match();
+                var playerOne = PlayerFactory.Create(account1.Username, deck1.Cards);
+                var playerTwo = PlayerFactory.Create(account2.Username, deck2.Cards);
+
+                context.StartGame(playerOne, playerTwo);
+                context.StartRound();
+
+                var matchId = Guid.NewGuid();
+                MatchStore.OngoingMatches[matchId] = context;
+
+                return Results.Ok(
+    MatchMapper.ToDto(matchId, context)
+);
+
+
+
+            });
+
+
+
 
 
             //});
+
+            ////player passing a turn
+            //POST / matches /{ matchId}/ players /{ playerId}/ pass
+
 
 
 
