@@ -3,7 +3,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Client;
 using PathOfIrregulars.API.Contracts;
 using PathOfIrregulars.API.Contracts.GameRelated;
+using PathOfIrregulars.API.Mappers;
 using PathOfIrregulars.Application;
+using PathOfIrregulars.Application.Mappers;
 using PathOfIrregulars.Application.Services;
 
 using PathOfIrregulars.Domain.Entities;
@@ -25,6 +27,9 @@ namespace PathOfIrregulars.API
 
         
             builder.Services.AddOpenApi();
+
+            //Add MatchStore to API
+            builder.Services.AddSingleton<MatchStore>();
 
             //Add card repository to Api services
             builder.Services.AddSingleton<CardRepository>(sp =>
@@ -165,11 +170,11 @@ namespace PathOfIrregulars.API
             // Get decks for specific account
             app.MapGet("/account/{id}/decks", async (int id, POIdbContext db) =>
             {
-                var account =  await db.Accounts.FirstOrDefaultAsync(p => p.Id == id);
+                var account =  await db.Accounts.Include(a => a.Decks).ThenInclude(d => d.Cards).FirstOrDefaultAsync(a => a.Id == id);
                 if (account == null)
                     return Results.NotFound();
-                var decks = account.Decks.ToList();
-                return Results.Ok(decks);
+
+                return Results.Ok(account.Decks);
             });
 
             //create a deck for user
@@ -204,12 +209,12 @@ namespace PathOfIrregulars.API
                     {
                         Name = dto.Name,
                         AccountId = account.Id,
-                        Cards = dto.CardIds
-                .Select(id => new Infrastructure.Database.Models.Card
+                        Cards = dto.CardIds.GroupBy(id => id)
+                .Select(c => new Infrastructure.Database.Models.Card
                         {
-                            CardId = id,
-                            Amount = 1
-                        })
+                            CardId = c.Key,
+                            Amount = c.Count()
+                })
                 .ToList()
                     };
 
@@ -225,7 +230,7 @@ namespace PathOfIrregulars.API
 
         
 
-            app.MapPost("/matches", async (CreateMatchDto data, POIdbContext db) =>
+            app.MapPost("/matches", async (CreateMatchDto data, POIdbContext db, CardRepository cardRepo) =>
             {
 
 
@@ -248,9 +253,16 @@ namespace PathOfIrregulars.API
                     return Results.NotFound("Decks could not be retrieved.");
                 }
 
+
+                var deck1Instances =
+                    DeckMapper.ToCardInstances(deck1.Cards, cardRepo);
+
+                var deck2Instances =
+                    DeckMapper.ToCardInstances(deck2.Cards, cardRepo);
+
                 var context = new Application.Match();
-                var playerOne = PlayerFactory.Create(account1.Username, deck1.Cards);
-                var playerTwo = PlayerFactory.Create(account2.Username, deck2.Cards);
+                var playerOne = PlayerFactory.Create(account1.Username, deck1Instances);
+                var playerTwo = PlayerFactory.Create(account2.Username, deck2Instances);
 
                 context.StartGame(playerOne, playerTwo);
                 context.StartRound();

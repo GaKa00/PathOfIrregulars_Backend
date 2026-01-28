@@ -13,12 +13,12 @@ namespace PathOfIrregulars.Application
         public string Name { get; set; }
         public int Power { get; set; }
 
-        public static CardStateDto From(Card card)
+        public static CardStateDto From(CardInstance card)
         {
             return new CardStateDto
             {
-                Id = card.Id,
-                Name = card.Name,
+                Id = card.Definition.Id,
+                Name = card.Definition.Name,
                 Power = card.Power
             };
         }

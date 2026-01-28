@@ -172,7 +172,7 @@ public void InitiateGameLoop()
                 Log($"It's not {player.Name}'s turn.");
                 return;
             }
-            var cardToPlay = player.Hand.FirstOrDefault(c => c.Id == cardId);
+            var cardToPlay = player.Hand.FirstOrDefault(c => c.Definition.Id == cardId);
             if (cardToPlay == null)
             {
                 Log($"{player.Name} does not have card with ID {cardId} in hand.");
@@ -195,7 +195,7 @@ public void InitiateGameLoop()
                     return;
                 }
 
-                var targetCard = targetCardId != null ? Board.CardsInPlay.FirstOrDefault(c => c.Id == targetCardId) : null;
+                var targetCard = targetCardId != null ? Board.CardsInPlay.FirstOrDefault(c => c.Definition.Id == targetCardId) : null;
                 var result = cardService.PlayCard(cardToPlay, this, lane, targetCard);
 
             }
@@ -331,7 +331,7 @@ public void InitiateGameLoop()
 
         public void ResolveTrigger(
     EffectTrigger trigger,
-    Card? sourceCard = null,
+    CardInstance? sourceCard = null,
     Player? owner = null
 )
         {
@@ -343,7 +343,7 @@ public void InitiateGameLoop()
 
             foreach (var card in cards)
             {
-                foreach (var effect in card.CardEffects
+                foreach (var effect in card.Definition.CardEffects
                              .Where(e => e.Trigger == trigger))
                 {
                     Registry.Execute(
@@ -358,7 +358,7 @@ public void InitiateGameLoop()
 
 
         // Equip artifact to climber
-        public void EquipArtifact(Card artifact, Card target)
+        public void EquipArtifact(CardInstance artifact, CardInstance target)
         {
       
             
@@ -374,37 +374,16 @@ public void InitiateGameLoop()
             targetClimber.EquippedArtifacts.Add(artifact);
             artifact.EquippedTo = targetClimber;
 
-            Log($"{artifact.Name} equipped to {targetClimber.Name}.");
+            Log($"{artifact.Definition.Name} equipped to {targetClimber.Definition.Name}.");
 
 
-            foreach (var effect in artifact.CardEffects.Where(e => e.Trigger == EffectTrigger.OnEquip))
+            foreach (var effect in artifact.Definition.CardEffects.Where(e => e.Trigger == EffectTrigger.OnEquip))
             {
                 Registry.Execute(effect.EffectId, artifact, this, effect.GetAmount());
             }
         }
         // utility method to get adjacent cards in a lane
-        public static List<Card> GetAdjacentCards(Card card, Lane lane) {
-
-            var cards = lane.CardsInLane;
-            var index = cards.IndexOf(card);
-            var adjacentCards = new List<Card>();
-
-            if ( index == -1)
-            {
-                return cards;
-            }
-
-            if (index > 0)
-            {
-                adjacentCards.Add(cards[index - 1]);
-            }
-            if (index < cards.Count - 1)
-            {
-                adjacentCards.Add(cards[index + 1]);
-            }
-            return cards;
-
-        }
+       
 
         //public void HandleCardDeathEffect(Card card)
         //{

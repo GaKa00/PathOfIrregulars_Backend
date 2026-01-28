@@ -13,7 +13,7 @@ namespace PathOfIrregulars.Application.Services
    public class EffectRegistry
     {
 
-        private readonly Dictionary<string, Func<Card, Match, int?,  Card?, EffectResult>> _executors;
+        private readonly Dictionary<string, Func<CardInstance, Match, int?,  CardInstance?, EffectResult>> _executors;
 
        
         private readonly Dictionary<string, EffectDefinition> _definitions;
@@ -40,7 +40,7 @@ namespace PathOfIrregulars.Application.Services
         // helper method to register effects into the registry
         private void Register(string id,
             EffectDefinition definition,
-            Func<Card, Match, int?, Card?, EffectResult> executor)
+            Func<CardInstance, Match, int?, CardInstance?, EffectResult> executor)
         {
             _executors[id] = executor;
             _definitions[id] = definition;
@@ -101,10 +101,10 @@ namespace PathOfIrregulars.Application.Services
                                 lane?.CardsInLane.Remove(target);
                                 context.ResolveTrigger(EffectTrigger.OnDeath, target);
                                 context.Opponent.Graveyard.Add(target);
-                                context.Log($"{target.Name} was destroyed.");
+                                context.Log($"{target.Definition.Name} was destroyed.");
                             }
                             return EffectResult.Ok(
-                                $"{card.Name} dealt {dmg} damage to {target.Name}."
+                                $"{card.Definition.Name} dealt {dmg} damage to {target.Definition.Name}."
                             );
                         }
                         );
@@ -128,7 +128,7 @@ namespace PathOfIrregulars.Application.Services
                         return EffectResult.Fail("No target selected for BuffCard effect.");
                     }
                     target.IncreasePower(buffAmount ?? 1);
-                    return EffectResult.Ok($"{card.Name} buffed {target.Name} by {buffAmount}.");
+                    return EffectResult.Ok($"{card.Definition.Name} buffed {target.Definition.Name} by {buffAmount}.");
                 }
                 );
             // deal damage to self effect, cannot target other cards, can be triggered on play or turn start (typically a setback for big power cards)
@@ -144,7 +144,7 @@ namespace PathOfIrregulars.Application.Services
                 {
                     if (!card.HasPower)
                     {
-                        return EffectResult.Fail($"{card.Name} has no power to deal damage to itself.");
+                        return EffectResult.Fail($"{card.Definition.Name} has no power to deal damage to itself.");
                     }
                     card.DecreasePower(damage ?? 1);
 
@@ -154,9 +154,9 @@ namespace PathOfIrregulars.Application.Services
                         context.ActivePlayer.Lanes.FirstOrDefault(l => l.CardsInLane.Contains(card))?.CardsInLane.Remove(card);
                         context.ResolveTrigger(EffectTrigger.OnDeath, card, owner: context.ActivePlayer);
                         context.ActivePlayer.Graveyard.Add(card);
-                        context.Log($"{card.Name} has been destroyed and sent to the graveyard.");
+                        context.Log($"{card.Definition.Name} has been destroyed and sent to the graveyard.");
                     }
-                    return EffectResult.Ok($"{card.Name} dealt {damage} damage to itself.");
+                    return EffectResult.Ok($"{card.Definition.Name} dealt {damage} damage to itself.");
                 }
 
                 );
@@ -171,12 +171,12 @@ namespace PathOfIrregulars.Application.Services
                 },
                 (card, context, buffAmount, target) =>
              {
-                 if (card.Type != CardType.Climber)
+                 if (card.Definition.Type != CardType.Climber)
                  {
-                     return EffectResult.Fail($"{card.Name} is not a Climber, and therefore can't gain power.");
+                     return EffectResult.Fail($"{card.Definition.Name} is not a Climber, and therefore can't gain power.");
                  }
                  card.IncreasePower(buffAmount ?? 1);
-                 return EffectResult.Ok($"{card.Name} buffed itself by {buffAmount}.");
+                 return EffectResult.Ok($"{card.Definition.Name} buffed itself by {buffAmount}.");
              }
              );
 
@@ -197,7 +197,7 @@ namespace PathOfIrregulars.Application.Services
                         return EffectResult.Fail("No target selected for HealTarget effect.");
                     }
                     target.IncreasePower(healAmount ?? 1);
-                    return EffectResult.Ok($"{card.Name} healed {target.Name} by {healAmount}.");
+                    return EffectResult.Ok($"{card.Definition.Name} healed {target.Definition.Name} by {healAmount}.");
                 }
                 );
 
@@ -220,7 +220,7 @@ namespace PathOfIrregulars.Application.Services
                     context.ResolveTrigger(EffectTrigger.OnDeath, target);
                     context.Opponent.Graveyard.Add(target);
                     return EffectResult.Ok(
-                        $"{card.Name} killed {target.Name}."
+                        $"{card.Definition.Name} killed {target.Definition.Name}."
                     );
                 }
                 );
@@ -229,10 +229,10 @@ namespace PathOfIrregulars.Application.Services
         // executes effect by id
         public EffectResult Execute(
        string effectId,
-       Card card,
+       CardInstance card,
        Match context,
        int? value = null,
-       Card? targetCard = null
+       CardInstance? targetCard = null
    )
     {
         if (!_executors.TryGetValue(effectId, out var effectFunc))

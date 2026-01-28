@@ -9,14 +9,14 @@ namespace PathOfIrregulars.Application.Services
     {
 
         // converts account to player entity used in actual game logic
-        public static Player Create(string name, List<Card> deck)
+        public static Player Create(string name, List<CardInstance> deck)
         {
             return new Player
             {
                 Name = name,
                 Deck = deck,
-                Hand = new List<Card>(),
-                Graveyard = new List<Card>(),
+                Hand = new List<CardInstance>(),
+                Graveyard = new List<CardInstance>(),
                 Lanes = new Lane[]
                 {
                 new Lane(LaneType.Vanguard),

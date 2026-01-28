@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 
 
-namespace PathOfIrregulars.Application
+namespace PathOfIrregulars.Application.Mappers
 {
     public static class MatchMapper
     {

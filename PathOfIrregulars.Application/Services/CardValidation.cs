@@ -4,7 +4,7 @@ namespace PathOfIrregulars.Application.Services
 {
     internal class CardValidation
     {
-        public static bool ValidatePlay(Card card, Match context, Lane lane)
+        public static bool ValidatePlay(CardInstance card, Match context, Lane lane)
         {
             //check if activeplayer played card
 
@@ -31,7 +31,7 @@ namespace PathOfIrregulars.Application.Services
 
             //check that climber card is going to a lane (if not discard effect)
 
-            if (card.Type == Domain.Enums.CardType.Climber && lane == null) {
+            if (card.Definition.Type == Domain.Enums.CardType.Climber && lane == null) {
                 return false;
             }
             //check that lane is not full (4 cards)
@@ -43,7 +43,7 @@ namespace PathOfIrregulars.Application.Services
 
             //for spell and artifact, check that lane is null
 
-            if ((card.Type == CardType.Spell || card.Type == CardType.Artifact) && lane != null) {
+            if ((card.Definition.Type == CardType.Spell || card.Definition.Type == CardType.Artifact) && lane != null) {
             }
 
             return true;
@@ -51,8 +51,8 @@ namespace PathOfIrregulars.Application.Services
 
 
         public static bool ValidateTarget(
-            Card sourceCard,
-            Card? targetCard,
+            CardInstance sourceCard,
+            CardInstance? targetCard,
             Match context
         )
         {
@@ -75,8 +75,8 @@ namespace PathOfIrregulars.Application.Services
 
         
             // Artifacts can only be equipped to climbers
-            if (sourceCard.Type == CardType.Artifact &&
-                targetCard.Type != CardType.Climber)
+            if (sourceCard.Definition.Type == CardType.Artifact &&
+                targetCard.Definition.Type != CardType.Climber)
                 return false;
 
 
@@ -87,8 +87,8 @@ namespace PathOfIrregulars.Application.Services
 
         public static bool ValidateEffect(
           CardEffect effect,
-          Card sourceCard,
-          Card? targetCard,
+          CardInstance sourceCard,
+          CardInstance? targetCard,
           Match context,
           EffectRegistry registry
       )

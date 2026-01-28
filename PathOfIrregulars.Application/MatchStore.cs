@@ -12,5 +12,25 @@ namespace PathOfIrregulars.Application
     {
 
         public static Dictionary<Guid, Match> OngoingMatches { get; } = new Dictionary<Guid, Match>();
+
+        public Guid Create(Match match)
+        {
+            var id = Guid.NewGuid();
+            OngoingMatches[id] = match;
+            return id;
+        }
+
+        public Match? Get(Guid matchId)
+        {
+            OngoingMatches.TryGetValue(matchId, out var match);
+            return match;
+        }
+
+        public void Remove(Guid matchId)
+        {
+            OngoingMatches.Remove(matchId);
+        }
+
+
     }
 }

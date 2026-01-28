@@ -13,7 +13,7 @@ namespace PathOfIrregulars.Application.Services
         public Player SourcePlayer { get; }
         public Player Opponent => Match.Opponent;
 
-        public Card? TargetCard { get; set; }
+        public CardInstance? TargetCard { get; set; }
 
         public EffectContext(Match match, Player sourcePlayer)
         {
