@@ -279,6 +279,31 @@ namespace PathOfIrregulars.API
 
             });
 
+            app.MapGet("/matches/{matchId}", (Guid matchId) =>
+            {
+                if (!MatchStore.OngoingMatches.TryGetValue(matchId, out var match))
+                {
+                    return Results.NotFound("Match not found.");
+                }
+                return Results.Ok(
+                    MatchMapper.ToDto(matchId, match)
+                );
+            });
+
+            app.MapPut("/matches/{matchId}/players/{playerId}/passTurn", () =>
+            {
+
+            });
+            app.MapPut("/matches/{matchId}/players/{playerId}/startTurn", () =>
+            {
+
+            });
+
+            app.MapPut("/matches/{matchId}/players/{playerId}/endTurn", () =>
+            {
+
+            });
+
 
 
 
