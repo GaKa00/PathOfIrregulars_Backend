@@ -2,11 +2,13 @@
 
 namespace PathOfIrregulars.API.Contracts.GameRelated
 {
-    public class CreateMatchDto
-    {
-        public int playerOneId { get; set; }
-        public int playerTwoId { get; set; }
-        public DeckDto playerOneDeck { get; set; } = new();
-        public DeckDto playerTwoDeck { get; set; } = new();
-    }
+ public class CreateMatchDto
+{
+    public int PlayerOneId { get; set; }
+    public int PlayerTwoId { get; set; }
+
+    public int PlayerOneDeckId { get; set; }
+    public int PlayerTwoDeckId { get; set; }
+}
+
 }

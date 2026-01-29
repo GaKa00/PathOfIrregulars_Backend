@@ -184,6 +184,7 @@ namespace PathOfIrregulars.API
                  POIdbContext db,
                  CardRepository cards) =>
                 {
+                    //ADD VALIDATION , Decks should not have the same name, be 40 cards. if lower they are invalid. -TODO
                     var account = await  db.Accounts
             .Include(a => a.Decks)
             .FirstOrDefaultAsync(a => a.Id == id);
@@ -234,8 +235,8 @@ namespace PathOfIrregulars.API
             {
 
 
-                var account1 =  await db.Accounts.FindAsync(data.playerOneId);
-                var account2 = await db.Accounts.FindAsync(data.playerTwoId);
+                var account1 =  await db.Accounts.FindAsync(data.PlayerOneId);
+                var account2 = await db.Accounts.FindAsync(data.PlayerTwoId);
 
 
                 if ( account1 == null || account2 == null)
@@ -244,9 +245,9 @@ namespace PathOfIrregulars.API
                 }
                 //add check for decks existing?
 
-                var deck1 = await db.Decks.Include(d => d.Cards).FirstOrDefaultAsync(d => d.Id == data.playerOneDeck.Id && d.AccountId == account1.Id);
+                var deck1 = await db.Decks.Include(d => d.Cards).FirstOrDefaultAsync(d => d.Id == data.PlayerOneDeckId && d.AccountId == account1.Id);
 
-                var deck2 =  await db.Decks.Include(d => d.Cards).FirstOrDefaultAsync(d => d.Id == data.playerTwoDeck.Id && d.AccountId == account2.Id);
+                var deck2 =  await db.Decks.Include(d => d.Cards).FirstOrDefaultAsync(d => d.Id == data.PlayerTwoDeckId && d.AccountId == account2.Id);
 
                 if (deck1 == null || deck2 == null)
                 {
