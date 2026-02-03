@@ -262,8 +262,8 @@ namespace PathOfIrregulars.API
                     DeckMapper.ToCardInstances(deck2.Cards, cardRepo);
 
                 var context = new Application.Match();
-                var playerOne = PlayerFactory.Create(account1.Username, deck1Instances);
-                var playerTwo = PlayerFactory.Create(account2.Username, deck2Instances);
+                var playerOne = PlayerFactory.Create( account1.Id, account1.Username, deck1Instances);
+                var playerTwo = PlayerFactory.Create(account2.Id, account2.Username, deck2Instances);
 
                 context.StartGame(playerOne, playerTwo);
                 context.StartRound();
@@ -290,18 +290,39 @@ namespace PathOfIrregulars.API
                 );
             });
 
-            app.MapPut("/matches/{matchId}/players/{playerId}/passTurn", () =>
+            app.MapPut("/matches/{matchId}/players/{playerId}/passTurn", ( Guid matchId, int playerId) =>
             {
+                if (!MatchStore.OngoingMatches.TryGetValue(matchId, out var match))
+                {
+                    return Results.NotFound("Match not found.");
+                }
+              var ActivePlayer = match.ActivePlayer;
+                if (ActivePlayer.Id != playerId)
+                {
+                    return Results.BadRequest("It's not the player's turn.");
+                }
+                match.ActivePlayer.HasPassed = true;
+                return Results.Ok(
+                    MatchMapper.ToDto(matchId, match)
+                );
 
             });
-            app.MapPut("/matches/{matchId}/players/{playerId}/startTurn", () =>
+            app.MapPut("/matches/{matchId}/players/{playerId}/startTurn", (Guid matchId, int playerId) =>
             {
-
+                // get match, run validations, start turn fn for player
             });
 
             app.MapPut("/matches/{matchId}/players/{playerId}/endTurn", () =>
             {
 
+            });
+
+            app.MapPut("/matches/{matchId}/players/{playerId}/playCard", () =>
+            {
+            });
+
+            app.MapPut("/matches/{matchId}/handleRound", () => {
+            
             });
 
 

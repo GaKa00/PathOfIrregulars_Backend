@@ -4,6 +4,7 @@ namespace PathOfIrregulars.Domain.Entities
 {
   public class Player
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public List<CardInstance> Hand { get; set; }
         public List<CardInstance> Deck { get; set; }
