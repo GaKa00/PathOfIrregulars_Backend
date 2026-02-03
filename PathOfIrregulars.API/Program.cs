@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Client;
 using PathOfIrregulars.API.Contracts;
@@ -290,6 +291,14 @@ namespace PathOfIrregulars.API
                 );
             });
 
+            app.MapGet("/matches", () =>
+            {
+                var matches = MatchStore.OngoingMatches
+                    .Select(kvp => MatchMapper.ToDto(kvp.Key, kvp.Value))
+                    .ToList();
+                return Results.Ok(matches);
+            });
+
             app.MapPut("/matches/{matchId}/players/{playerId}/passTurn", ( Guid matchId, int playerId) =>
             {
                 if (!MatchStore.OngoingMatches.TryGetValue(matchId, out var match))
@@ -309,11 +318,38 @@ namespace PathOfIrregulars.API
             });
             app.MapPut("/matches/{matchId}/players/{playerId}/startTurn", (Guid matchId, int playerId) =>
             {
-                // get match, run validations, start turn fn for player
+                if (!MatchStore.OngoingMatches.TryGetValue(matchId, out var match))
+                {
+                    return Results.NotFound("Match not found.");
+                }
+                var ActivePlayer = match.ActivePlayer;
+                if (ActivePlayer.Id != playerId)
+                {
+                    return Results.BadRequest("It's not the player's turn.");
+                }
+
+                match.StartTurn(ActivePlayer);
+                return Results.Ok(
+                    MatchMapper.ToDto(matchId, match)
+                );
             });
 
-            app.MapPut("/matches/{matchId}/players/{playerId}/endTurn", () =>
+            app.MapPut("/matches/{matchId}/players/{playerId}/endTurn", ( Guid matchId, int playerId) =>
             {
+                if (!MatchStore.OngoingMatches.TryGetValue(matchId, out var match))
+                {
+                    return Results.NotFound("Match not found.");
+                }
+                var ActivePlayer = match.ActivePlayer;
+                if (ActivePlayer.Id != playerId)
+                {
+                    return Results.BadRequest("It's not the player's turn.");
+                }
+
+                match.EndTurn();
+                return Results.Ok(
+                    MatchMapper.ToDto(matchId, match)
+                );
 
             });
 
