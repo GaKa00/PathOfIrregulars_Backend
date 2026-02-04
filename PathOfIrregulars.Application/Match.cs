@@ -164,7 +164,7 @@ public void InitiateGameLoop()
             return;
         }
 
-    public void Playcard(string playerName, string cardId, string? laneId, string? targetCardId)
+    public void PlayCard(string playerName, string cardId, string? laneId, string? targetCardId)
         {
             var player = playerName == PlayerOne.Name ? PlayerOne : PlayerTwo;
             if (player != ActivePlayer)
