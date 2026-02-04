@@ -173,9 +173,10 @@ public void InitiateGameLoop()
                 return;
             }
             var cardToPlay = player.Hand.FirstOrDefault(c => c.Definition.Id == cardId);
+
             if (cardToPlay == null)
             {
-                Log($"{player.Name} does not have card with ID {cardId} in hand.");
+                Log($"{player.Name}  does not have card with ID {cardId} in hand.");
                 return;
             }
             Lane? lane = null;

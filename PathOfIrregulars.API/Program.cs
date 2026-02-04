@@ -328,6 +328,17 @@ namespace PathOfIrregulars.API
                     return Results.BadRequest("It's not the player's turn.");
                 }
 
+                foreach (var card in ActivePlayer.Hand)
+                {
+                    System.Console.WriteLine($"Card in hand: {card.Definition.Name} (ID: {card.Definition.Id})");
+                }
+               
+                foreach (var lane in ActivePlayer.Lanes)
+                {
+                    System.Console.WriteLine($"Lane ID: {lane.LaneType}");
+                
+                }
+
                 match.StartTurn(ActivePlayer);
                 return Results.Ok(
                     MatchMapper.ToDto(matchId, match)
@@ -353,7 +364,7 @@ namespace PathOfIrregulars.API
 
             });
 
-            app.MapPut("/matches/{matchId}/players/{playerId}/playCard", (Guid matchId, int playerId, string cardId, string laneId, string? targetId) =>
+            app.MapPut("/matches/{matchId}/players/{playerId}/playCard", (Guid matchId, int playerId, string cardId, string? laneId, string? targetId) =>
             {
                 if (!MatchStore.OngoingMatches.TryGetValue(matchId, out var match))
                 {
@@ -365,8 +376,8 @@ namespace PathOfIrregulars.API
                     return Results.BadRequest("It's not the player's turn.");
                 }
 
-                var cardToPlay = ActivePlayer.Hand.FirstOrDefault(c => c.InstanceId == cardId);
 
+                var cardToPlay = ActivePlayer.Hand.FirstOrDefault(c => c.Definition.Id == cardId);
                 if (cardToPlay == null)
                 {
                     return Results.BadRequest("Card not found in player's hand.");
@@ -374,7 +385,7 @@ namespace PathOfIrregulars.API
 
 
              
-                match.PlayCard(ActivePlayer.Name, cardToPlay.InstanceId, laneId, targetId  );
+                match.PlayCard(ActivePlayer.Name, cardToPlay.Definition.Id, laneId, targetId  );
 
                 return Results.Ok(
                     MatchMapper.ToDto(matchId, match)
