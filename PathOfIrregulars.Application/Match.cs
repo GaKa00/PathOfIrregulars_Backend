@@ -58,9 +58,10 @@ namespace PathOfIrregulars.Application
             SetupBoard();
             SetTurnOrder();
 
+            var rnd = new Random();
 
-            p1.ShuffleDeck();
-            p2.ShuffleDeck();
+            p1.ShuffleDeck(rnd);
+            p2.ShuffleDeck(rnd);
 
             //draw opening hands
             for (int i = 1; i < 10; i++)
@@ -190,8 +191,8 @@ public void InitiateGameLoop()
                         return;
                     }
                 }
-                else
-                {
+                else if (laneId != null)
+            {
                     Log($"{laneId} is not a valid LaneType.");
                     return;
                 }

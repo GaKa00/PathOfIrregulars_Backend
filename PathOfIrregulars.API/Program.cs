@@ -63,6 +63,8 @@ namespace PathOfIrregulars.API
             // Get all cards as per Dto definition
             app.MapGet("/cards", (CardRepository cards) =>
             {
+
+                //maybe need all unique ones.. and pagination?
                 var result = cards.GetAll()
                     .Select(card => new CardDto(
                         card.Id,
@@ -347,6 +349,7 @@ namespace PathOfIrregulars.API
 
             app.MapPut("/matches/{matchId}/players/{playerId}/endTurn", ( Guid matchId, int playerId) =>
             {
+
                 if (!MatchStore.OngoingMatches.TryGetValue(matchId, out var match))
                 {
                     return Results.NotFound("Match not found.");
@@ -355,6 +358,17 @@ namespace PathOfIrregulars.API
                 if (ActivePlayer.Id != playerId)
                 {
                     return Results.BadRequest("It's not the player's turn.");
+                }
+
+                if (ActivePlayer.Hand.Count == 0)
+                {
+
+                    ActivePlayer.HasPassed = true;
+                    return Results.Ok(
+                        MatchMapper.ToDto(matchId, match)
+                    );
+
+
                 }
 
                 match.EndTurn();
@@ -394,18 +408,33 @@ namespace PathOfIrregulars.API
 
             });
 
-            app.MapPut("/matches/{matchId}/handleRound", () => {
-            
+            app.MapPut("/matches/{matchId}/handleRound", (Guid matchId) => {
+                if (!MatchStore.OngoingMatches.TryGetValue(matchId, out var match))
+                {
+                    return Results.NotFound("Match not found.");
+                }
+
+                if (match.PlayerOne.HasPassed && match.PlayerTwo.HasPassed)
+                {
+                    match.EndRound();
+                    if (!match.HasGameEnded)
+                    {
+                        match.StartRound();
+                    }
+                }
+                return Results.Ok(
+                    MatchMapper.ToDto(matchId, match)
+                );
+
+
+
             });
 
 
 
 
 
-            //});
-
-            ////player passing a turn
-            //POST / matches /{ matchId}/ players /{ playerId}/ pass
+     
 
 
 

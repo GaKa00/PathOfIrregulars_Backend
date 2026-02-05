@@ -30,10 +30,13 @@ namespace PathOfIrregulars.Domain.Entities
             return drawnCard;
         }
 
-        public void ShuffleDeck()
+        public void ShuffleDeck(Random rng)
         {
-            var rnd = new Random();
-            Deck = Deck.OrderBy(x => rnd.Next()).ToList();
+            for (int i = Deck.Count - 1; i > 0; i--)
+            {
+                int j = rng.Next(i + 1);
+                (Deck[i], Deck[j]) = (Deck[j], Deck[i]);
+            }
         }
 
         // Select card to play from hand- will later take id as parameter
