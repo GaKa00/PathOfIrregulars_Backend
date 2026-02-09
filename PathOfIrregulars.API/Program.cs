@@ -217,11 +217,10 @@ namespace PathOfIrregulars.API
                 return Results.Ok();
             });
 
-            app.MapPost("/auth/login", async (
-    LoginDto dto,
-    POIdbContext db,
-    JwtTokenService tokens
-) =>
+
+
+
+            app.MapPost("/auth/login", async ( LoginDto dto, POIdbContext db,  JwtTokenService tokens) =>
             {
                 var account = await db.Accounts
                     .FirstOrDefaultAsync(a => a.Username == dto.Username);
