@@ -2,31 +2,36 @@
   "Cards": [
     {
       "Id": "bam_irregular",
-      "Name": "Bam, Irregular",
+      "Name": "Bam,Irregular",
+      "Description":  "On Play: Buff own power by 2.",
       "Type": "Climber",
       "Power": 5,
       "Effects": [
         {
           "EffectId": "BuffSelf",
+          "Trigger":  "OnPlay",
           "Parameters": { "amount": 2 }
         }
       ]
     },
     {
       "Id": "khun_strategist",
-      "Name": "Khun, Strategist",
+      "Name": "Khun,Strategist",
+      "Description": "On Play: Draw 1 card",
       "Type": "Climber",
       "Power": 4,
       "Effects": [
         {
           "EffectId": "DrawCard",
+          "Trigger" :  "OnPlay",
           "Parameters": { "amount": 1 }
         }
       ]
     },
     {
       "Id": "rak_spear_bearer",
-      "Name": "Rak, Spear Bearer",
+      "Name": "Rak,Spear Bearer",
+      "Description" :  "",
       "Type": "Climber",
       "Power": 7,
       "Effects": []
@@ -34,11 +39,13 @@
     {
       "Id": "anak_jahad",
       "Name": "Anak Jahad",
+      "Description": "On Play: Dreal 2 damage to target card",
       "Type": "Climber",
       "Power": 6,
       "Effects": [
         {
           "EffectId": "DealDamageToTarget",
+          "Trigger":  "OnPlay",
           "Parameters": { "amount": 2 }
         }
       ]
@@ -46,11 +53,13 @@
     {
       "Id": "endorse_kick",
       "Name": "Endorsi's Kick",
+      "Description": "On Play: Deal 4 damage to target card",
       "Type": "Spell",
       "Power": 0,
       "Effects": [
         {
           "EffectId": "DealDamageToTarget",
+          "Trigger":  "OnPlay",
           "Parameters": { "amount": 4 }
         }
       ]
@@ -58,11 +67,13 @@
     {
       "Id": "shinsu_barrier",
       "Name": "Shinsu Barrier",
+      "Description": "On Play: increase target climber's power by 3'",
       "Type": "Spell",
       "Power": 0,
       "Effects": [
         {
           "EffectId": "BuffCardToTarget",
+          "Trigger":  "OnPlay",
           "Parameters": { "amount": 3 }
         }
       ]
@@ -70,11 +81,13 @@
     {
       "Id": "lighthouse_scan",
       "Name": "Lighthouse Scan",
+      "Description": "On Play: Draw 2 cards",
       "Type": "Spell",
       "Power": 0,
       "Effects": [
         {
           "EffectId": "DrawCard",
+          "Trigger":  "OnPlay",
           "Parameters": { "amount": 2 }
         }
       ]
@@ -83,22 +96,19 @@
       "Id": "black_march",
       "Name": "Black March",
       "Type": "Artifact",
-      "Power": 0,
-      "Effects": [
-        {
-          "EffectId": "BuffSelf",
-          "Parameters": { "amount": 4 }
-        }
-      ]
+      "Power": 4,
+      "Effects": []
     },
     {
       "Id": "green_april",
       "Name": "Green April",
+      "Description": "On Equip: Deal 3 damage to target card",
       "Type": "Artifact",
-      "Power": 0,
+      "Power": 2,
       "Effects": [
         {
           "EffectId": "DealDamageToTarget",
+          "Trigger":  "OnEquip",
           "Parameters": { "amount": 3 }
         }
       ]
@@ -106,11 +116,13 @@
     {
       "Id": "quant_ambush",
       "Name": "Quant's Ambush",
+      "Description": "On Play: Deal 2 damage to all climbers in one lane",
       "Type": "Spell",
       "Power": 0,
       "Effects": [
         {
           "EffectId": "DealDamageToTarget",
+          "Trigger" :  "OnPlay",
           "Parameters": { "amount": 6 }
         }
       ]

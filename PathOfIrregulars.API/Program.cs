@@ -33,6 +33,14 @@ namespace PathOfIrregulars.API
         
             builder.Services.AddOpenApi();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("Allow Frontend", policy =>
+                {
+                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+                });
+            });
+
             //Add MatchStore to API
             builder.Services.AddSingleton<MatchStore>();
 
@@ -71,6 +79,8 @@ namespace PathOfIrregulars.API
                 });
             var app = builder.Build();
 
+            app.UseCors("Allow Frontend");
+
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -97,6 +107,7 @@ namespace PathOfIrregulars.API
                     .Select(card => new CardDto(
                         card.Id,
                         card.Name,
+                        card.Description,
                         card.Type,
                         card.Power
                     ))
@@ -116,6 +127,7 @@ namespace PathOfIrregulars.API
                     var result = new CardDto(
                         card.Id,
                         card.Name,
+                        card.Description,
                         card.Type,
                         card.Power
                     );
@@ -159,48 +171,10 @@ namespace PathOfIrregulars.API
                 return Results.Ok(result);
             });
 
-            //// Mock account creation 
-            //app.MapPost("/accounts", async (
-            //  CreateAccountDto dto,
-            //  POIdbContext db) =>
-            //{
-            //    if (dto == null)
-            //        return Results.BadRequest("Request body is required.");
-
-            //    if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
-            //        return Results.BadRequest("Username and Password are required.");
-
-            //    var usernameExists = await db.Accounts.AnyAsync(a => a.Username == dto.Username);
-            //    if (usernameExists)
-            //        return Results.Conflict($"Username '{dto.Username}' already exists.");
-
-            //    var account = new Account
-            //    {
-            //        Username = dto.Username,
-            //        PasswordHash = dto.Password, 
-            //        Elo = 1000,
-
-            //    };
-
-            //    db.Accounts.Add(account);
-            //    await db.SaveChangesAsync();
-
-            //    return Results.Created(
-            //        $"/accounts/{account.Id}",
-            //        new AccountDto(
-            //            account.Id,
-            //            account.Username,
-            //            account.Elo,
-            //            new List<DeckDto>()
-            //        )
-            //    );
-            //});
+    
 
 
-            app.MapPost("/auth/register", async (
-   RegisterDto dto,
-   POIdbContext db
-) =>
+            app.MapPost("/auth/register", async ( RegisterDto dto, POIdbContext db) =>
             {
                 if (await db.Accounts.AnyAsync(a => a.Username == dto.Username))
                     return Results.BadRequest("Username already taken");
