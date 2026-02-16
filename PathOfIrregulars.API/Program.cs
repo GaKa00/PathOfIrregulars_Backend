@@ -1,8 +1,12 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Client;
+using Microsoft.IdentityModel.Tokens;
+using PathOfIrregulars.API.Auth;
 using PathOfIrregulars.API.Contracts;
+using PathOfIrregulars.API.Contracts.Auth;
 using PathOfIrregulars.API.Contracts.GameRelated;
 using PathOfIrregulars.API.Mappers;
 using PathOfIrregulars.Application;
@@ -29,6 +33,14 @@ namespace PathOfIrregulars.API
         
             builder.Services.AddOpenApi();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("Allow Frontend", policy =>
+                {
+                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+                });
+            });
+
             //Add MatchStore to API
             builder.Services.AddSingleton<MatchStore>();
 
@@ -46,7 +58,33 @@ namespace PathOfIrregulars.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddScoped<JwtTokenService>();
+
+            builder.Services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+                        )
+                    };
+                });
             var app = builder.Build();
+
+            app.UseCors("Allow Frontend");
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+       
 
             //Swagger middleware - remember to add /swagger to the url
             if (app.Environment.IsDevelopment())
@@ -69,6 +107,7 @@ namespace PathOfIrregulars.API
                     .Select(card => new CardDto(
                         card.Id,
                         card.Name,
+                        card.Description,
                         card.Type,
                         card.Power
                     ))
@@ -88,6 +127,7 @@ namespace PathOfIrregulars.API
                     var result = new CardDto(
                         card.Id,
                         card.Name,
+                        card.Description,
                         card.Type,
                         card.Power
                     );
@@ -131,42 +171,51 @@ namespace PathOfIrregulars.API
                 return Results.Ok(result);
             });
 
-            // Mock account creation 
-            app.MapPost("/accounts", async (
-              CreateAccountDto dto,
-              POIdbContext db) =>
+    
+
+
+            app.MapPost("/auth/register", async ( RegisterDto dto, POIdbContext db) =>
             {
-                if (dto == null)
-                    return Results.BadRequest("Request body is required.");
-
-                if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
-                    return Results.BadRequest("Username and Password are required.");
-
-                var usernameExists = await db.Accounts.AnyAsync(a => a.Username == dto.Username);
-                if (usernameExists)
-                    return Results.Conflict($"Username '{dto.Username}' already exists.");
+                if (await db.Accounts.AnyAsync(a => a.Username == dto.Username))
+                    return Results.BadRequest("Username already taken");
 
                 var account = new Account
                 {
                     Username = dto.Username,
-                    PasswordHash = dto.Password, 
-                    Elo = 1000,
-                   
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password)
                 };
 
                 db.Accounts.Add(account);
                 await db.SaveChangesAsync();
 
-                return Results.Created(
-                    $"/accounts/{account.Id}",
-                    new AccountDto(
-                        account.Id,
-                        account.Username,
-                        account.Elo,
-                        new List<DeckDto>()
-                    )
-                );
+                return Results.Ok();
             });
+
+
+
+
+            app.MapPost("/auth/login", async ( LoginDto dto, POIdbContext db,  JwtTokenService tokens) =>
+            {
+                var account = await db.Accounts
+                    .FirstOrDefaultAsync(a => a.Username == dto.Username);
+
+                if (account == null)
+                    return Results.Unauthorized();
+
+                if (!BCrypt.Net.BCrypt.Verify(dto.Password, account.PasswordHash))
+                    return Results.Unauthorized();
+
+                var token = tokens.CreateToken(account);
+
+                return Results.Ok(new
+                {
+                    token,
+                    accountId = account.Id,
+                    username = account.Username,
+                    
+                });
+            });
+
 
 
 
