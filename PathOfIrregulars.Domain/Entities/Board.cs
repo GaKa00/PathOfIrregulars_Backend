@@ -11,7 +11,7 @@ namespace PathOfIrregulars.Domain.Entities
         public List<Lane> PlayerOneLanes { get; set; }
         public List<Lane> PlayerTwoLanes { get; set; }
 
-        public IEnumerable<Card> CardsInPlay
+        public IEnumerable<CardInstance> CardsInPlay
             => PlayerOneLanes.SelectMany(l => l.CardsInLane)
             .Concat(PlayerTwoLanes.SelectMany(l => l.CardsInLane));
     }

@@ -9,13 +9,13 @@ namespace PathOfIrregulars.Domain.Entities
 {
     public class Lane
     {
-        public List<Card> CardsInLane { get; set; }
+        public List<CardInstance> CardsInLane { get; set; }
         public LaneType LaneType { get; set; }
 
         public Lane(LaneType type)
         {
             LaneType = type;
-            CardsInLane = new List<Card>();
+            CardsInLane = new List<CardInstance>();
         }
 
         public int Power { get; private set; }
@@ -34,7 +34,7 @@ namespace PathOfIrregulars.Domain.Entities
         public int CalculateLanePower()
         {
             return CardsInLane
-                .Where(c => c.Power != null)
+                .Where(c => c.Definition.Power != null)
                 .Sum(c => c.Power);
         }
     }

@@ -1,13 +1,19 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Client;
 using PathOfIrregulars.API.Contracts;
+using PathOfIrregulars.API.Contracts.GameRelated;
+using PathOfIrregulars.API.Mappers;
 using PathOfIrregulars.Application;
+using PathOfIrregulars.Application.Mappers;
 using PathOfIrregulars.Application.Services;
-using PathOfIrregulars.Application.Services.PathOfIrregulars.Application.Services;
+
 using PathOfIrregulars.Domain.Entities;
 using PathOfIrregulars.Infrastructure.Database.Data;
 using PathOfIrregulars.Infrastructure.Database.Models;
 using PathOfIrregulars.Infrastructure.Persistence;
+using System.Text.RegularExpressions;
 
 namespace PathOfIrregulars.API
 {
@@ -22,6 +28,9 @@ namespace PathOfIrregulars.API
 
         
             builder.Services.AddOpenApi();
+
+            //Add MatchStore to API
+            builder.Services.AddSingleton<MatchStore>();
 
             //Add card repository to Api services
             builder.Services.AddSingleton<CardRepository>(sp =>
@@ -54,6 +63,8 @@ namespace PathOfIrregulars.API
             // Get all cards as per Dto definition
             app.MapGet("/cards", (CardRepository cards) =>
             {
+
+                //maybe need all unique ones.. and pagination?
                 var result = cards.GetAll()
                     .Select(card => new CardDto(
                         card.Id,
@@ -162,11 +173,11 @@ namespace PathOfIrregulars.API
             // Get decks for specific account
             app.MapGet("/account/{id}/decks", async (int id, POIdbContext db) =>
             {
-                var account =  await db.Accounts.FirstOrDefaultAsync(p => p.Id == id);
+                var account =  await db.Accounts.Include(a => a.Decks).ThenInclude(d => d.Cards).FirstOrDefaultAsync(a => a.Id == id);
                 if (account == null)
                     return Results.NotFound();
-                var decks = account.Decks.ToList();
-                return Results.Ok(decks);
+
+                return Results.Ok(account.Decks);
             });
 
             //create a deck for user
@@ -176,6 +187,7 @@ namespace PathOfIrregulars.API
                  POIdbContext db,
                  CardRepository cards) =>
                 {
+                    //ADD VALIDATION , Decks should not have the same name, be 40 cards. if lower they are invalid. -TODO
                     var account = await  db.Accounts
             .Include(a => a.Decks)
             .FirstOrDefaultAsync(a => a.Id == id);
@@ -201,12 +213,12 @@ namespace PathOfIrregulars.API
                     {
                         Name = dto.Name,
                         AccountId = account.Id,
-                        Cards = dto.CardIds
-                .Select(id => new Infrastructure.Database.Models.Card
+                        Cards = dto.CardIds.GroupBy(id => id)
+                .Select(c => new Infrastructure.Database.Models.Card
                         {
-                            CardId = id,
-                            Amount = 1
-                        })
+                            CardId = c.Key,
+                            Amount = c.Count()
+                })
                 .ToList()
                     };
 
@@ -220,45 +232,210 @@ namespace PathOfIrregulars.API
                 });
 
 
-            //// create a new match, todo
-            //app.MapPost("/Matches", (int p1, int p2, Deck deck1, Deck deck2, POIdbContext db) =>
-            //{
-            //    var context = new GameContext();
-            //    var transformer = new PlayerFactory();
+        
 
-            //    var Account1 = db.Accounts.FirstOrDefault(a => a.Id == p1);
-            //    var Account2 = db.Accounts.FirstOrDefault(a => a.Id == p2);
-
-            //    var player1 = null;
-            //    var player2 = null;
+            app.MapPost("/matches", async (CreateMatchDto data, POIdbContext db, CardRepository cardRepo) =>
+            {
 
 
-            //    var player1Deck = db.Decks.FirstOrDefault(d => d.AccountId == p1);
-            //    if (player1Deck != null)
-            //    {
-            //      player1 = transformer.Create(Account1.Username, deck1.Cards);
-            //    }
-            //    else
-            //    {
-            //        return Results.NotFound("Player 1 Deck not found");
-            //    }
+                var account1 =  await db.Accounts.FindAsync(data.PlayerOneId);
+                var account2 = await db.Accounts.FindAsync(data.PlayerTwoId);
 
-            //    var player2Deck = db.Decks.FirstOrDefault(d => d.AccountId == p2);
-            //    if (player2Deck != null)
-            //    {
-            //        player2 = transformer.Create(Account2.Username, deck2.Cards);
-            //    }
-            //    else
-            //    {
-            //        return Results.NotFound("Player 2 Deck not found");
-            //    }
 
-            //    context.StartGame(player1, player2);
+                if ( account1 == null || account2 == null)
+                {
+                    return Results.NotFound("Accounts could not be retrieved.");
+                }
+                //add check for decks existing?
 
+                var deck1 = await db.Decks.Include(d => d.Cards).FirstOrDefaultAsync(d => d.Id == data.PlayerOneDeckId && d.AccountId == account1.Id);
+
+                var deck2 =  await db.Decks.Include(d => d.Cards).FirstOrDefaultAsync(d => d.Id == data.PlayerTwoDeckId && d.AccountId == account2.Id);
+
+                if (deck1 == null || deck2 == null)
+                {
+                    return Results.NotFound("Decks could not be retrieved.");
+                }
+
+
+                var deck1Instances =
+                    DeckMapper.ToCardInstances(deck1.Cards, cardRepo);
+
+                var deck2Instances =
+                    DeckMapper.ToCardInstances(deck2.Cards, cardRepo);
+
+                var context = new Application.Match();
+                var playerOne = PlayerFactory.Create( account1.Id, account1.Username, deck1Instances);
+                var playerTwo = PlayerFactory.Create(account2.Id, account2.Username, deck2Instances);
+
+                context.StartGame(playerOne, playerTwo);
+                context.StartRound();
+
+                var matchId = Guid.NewGuid();
+                MatchStore.OngoingMatches[matchId] = context;
+
+                return Results.Ok(
+    MatchMapper.ToDto(matchId, context)
+);
+
+
+
+            });
+
+            app.MapGet("/matches/{matchId}", (Guid matchId) =>
+            {
+                if (!MatchStore.OngoingMatches.TryGetValue(matchId, out var match))
+                {
+                    return Results.NotFound("Match not found.");
+                }
+                return Results.Ok(
+                    MatchMapper.ToDto(matchId, match)
+                );
+            });
+
+            app.MapGet("/matches", () =>
+            {
+                var matches = MatchStore.OngoingMatches
+                    .Select(kvp => MatchMapper.ToDto(kvp.Key, kvp.Value))
+                    .ToList();
+                return Results.Ok(matches);
+            });
+
+            app.MapPut("/matches/{matchId}/players/{playerId}/passTurn", ( Guid matchId, int playerId) =>
+            {
+                if (!MatchStore.OngoingMatches.TryGetValue(matchId, out var match))
+                {
+                    return Results.NotFound("Match not found.");
+                }
+              var ActivePlayer = match.ActivePlayer;
+                if (ActivePlayer.Id != playerId)
+                {
+                    return Results.BadRequest("It's not the player's turn.");
+                }
+                match.ActivePlayer.HasPassed = true;
+                return Results.Ok(
+                    MatchMapper.ToDto(matchId, match)
+                );
+
+            });
+            app.MapPut("/matches/{matchId}/players/{playerId}/startTurn", (Guid matchId, int playerId) =>
+            {
+                if (!MatchStore.OngoingMatches.TryGetValue(matchId, out var match))
+                {
+                    return Results.NotFound("Match not found.");
+                }
+                var ActivePlayer = match.ActivePlayer;
+                if (ActivePlayer.Id != playerId)
+                {
+                    return Results.BadRequest("It's not the player's turn.");
+                }
+
+                foreach (var card in ActivePlayer.Hand)
+                {
+                    System.Console.WriteLine($"Card in hand: {card.Definition.Name} (ID: {card.Definition.Id})");
+                }
+               
+                foreach (var lane in ActivePlayer.Lanes)
+                {
+                    System.Console.WriteLine($"Lane ID: {lane.LaneType}");
                 
+                }
+
+                match.StartTurn(ActivePlayer);
+                return Results.Ok(
+                    MatchMapper.ToDto(matchId, match)
+                );
+            });
+
+            app.MapPut("/matches/{matchId}/players/{playerId}/endTurn", ( Guid matchId, int playerId) =>
+            {
+
+                if (!MatchStore.OngoingMatches.TryGetValue(matchId, out var match))
+                {
+                    return Results.NotFound("Match not found.");
+                }
+                var ActivePlayer = match.ActivePlayer;
+                if (ActivePlayer.Id != playerId)
+                {
+                    return Results.BadRequest("It's not the player's turn.");
+                }
+
+                if (ActivePlayer.Hand.Count == 0)
+                {
+
+                    ActivePlayer.HasPassed = true;
+                    return Results.Ok(
+                        MatchMapper.ToDto(matchId, match)
+                    );
 
 
-            //});
+                }
+
+                match.EndTurn();
+                return Results.Ok(
+                    MatchMapper.ToDto(matchId, match)
+                );
+
+            });
+
+            app.MapPut("/matches/{matchId}/players/{playerId}/playCard", (Guid matchId, int playerId, string cardId, string? laneId, string? targetId) =>
+            {
+                if (!MatchStore.OngoingMatches.TryGetValue(matchId, out var match))
+                {
+                    return Results.NotFound("Match not found.");
+                }
+                var ActivePlayer = match.ActivePlayer;
+                if (ActivePlayer.Id != playerId)
+                {
+                    return Results.BadRequest("It's not the player's turn.");
+                }
+
+
+                var cardToPlay = ActivePlayer.Hand.FirstOrDefault(c => c.Definition.Id == cardId);
+                if (cardToPlay == null)
+                {
+                    return Results.BadRequest("Card not found in player's hand.");
+                }
+
+
+             
+                match.PlayCard(ActivePlayer.Name, cardToPlay.Definition.Id, laneId, targetId  );
+
+                return Results.Ok(
+                    MatchMapper.ToDto(matchId, match)
+                );
+
+
+            });
+
+            app.MapPut("/matches/{matchId}/handleRound", (Guid matchId) => {
+                if (!MatchStore.OngoingMatches.TryGetValue(matchId, out var match))
+                {
+                    return Results.NotFound("Match not found.");
+                }
+
+                if (match.PlayerOne.HasPassed && match.PlayerTwo.HasPassed)
+                {
+                    match.EndRound();
+                    if (!match.HasGameEnded)
+                    {
+                        match.StartRound();
+                    }
+                }
+                return Results.Ok(
+                    MatchMapper.ToDto(matchId, match)
+                );
+
+
+
+            });
+
+
+
+
+
+     
+
 
 
 

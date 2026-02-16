@@ -4,10 +4,11 @@ namespace PathOfIrregulars.Domain.Entities
 {
   public class Player
     {
+        public int Id { get; set; }
         public string Name { get; set; }
-        public List<Card> Hand { get; set; }
-        public List<Card> Deck { get; set; }
-        public List<Card> Graveyard { get; set; }
+        public List<CardInstance> Hand { get; set; }
+        public List<CardInstance> Deck { get; set; }
+        public List<CardInstance> Graveyard { get; set; }
 
         public Lane[] Lanes { get; set; }
 
@@ -15,7 +16,7 @@ namespace PathOfIrregulars.Domain.Entities
         public int WonRounds { get; set; } = 0;
         public bool HasPassed { get; set; }
 
-        public Card DrawCard()
+        public CardInstance DrawCard()
         {
             if (Deck.Count == 0)
             {
@@ -29,18 +30,21 @@ namespace PathOfIrregulars.Domain.Entities
             return drawnCard;
         }
 
-        public void ShuffleDeck()
+        public void ShuffleDeck(Random rng)
         {
-            var rnd = new Random();
-            Deck = Deck.OrderBy(x => rnd.Next()).ToList();
+            for (int i = Deck.Count - 1; i > 0; i--)
+            {
+                int j = rng.Next(i + 1);
+                (Deck[i], Deck[j]) = (Deck[j], Deck[i]);
+            }
         }
 
         // Select card to play from hand- will later take id as parameter
-        public Card SelectCard()
+        public CardInstance SelectCard()
         {
             for (int i = 0; i < Hand.Count; i++)
             {
-                Console.WriteLine($"{i}: {Hand[i].Name} (Power: {Hand[i].Power})");
+                Console.WriteLine($"{i}: {Hand[i].Definition.Name} (Power: {Hand[i].Power})");
             }
 
             Console.WriteLine("Select a card to play");

@@ -15,43 +15,44 @@ namespace PathOfIrregulars.Application.Services
 
         public CardService(EffectRegistry registry) => _registry = registry;
 
-        public EffectResult PlayCard(Card card, GameContext context, Lane? lane)
+        public EffectResult PlayCard(CardInstance card, Match context, Lane? lane, CardInstance? target)
         {
 
             // Validate card is in hand
             if (!context.ActivePlayer.Hand.Contains(card))
-                return EffectResult.Fail($"{card.Name} is not in {context.ActivePlayer.Name}'s hand.");
+                return EffectResult.Fail($"{card.Definition.Name} is not in {context.ActivePlayer.Name}'s hand.");
 
             context.ActivePlayer.Hand.Remove(card);
 
 
             // Handle card types
-            if (card.Type == CardType.Climber)
+            if (card.Definition.Type == CardType.Climber)
             {
                 if (lane == null)
                     return EffectResult.Fail("A climber must be played to a lane.");
 
                 lane.CardsInLane.Add(card);
-                context.Log($"{context.ActivePlayer.Name} plays {card.Name} in lane {lane.LaneType}.");
+                context.Log($"{context.ActivePlayer.Name} plays {card.Definition.Name} in lane {lane.LaneType}.");
 
            
                 lane.AddPower(card.Power);
             }
-            else if (card.Type == CardType.Artifact)
+            else if (card.Definition.Type == CardType.Artifact)
             {
-                context.EquipArtifact(card);
+                context.EquipArtifact(card, target);
 
-                return EffectResult.Ok($"{card.Name} equipped.");
+                return EffectResult.Ok($"{card.Definition.Name} equipped.");
             }
 
             // Execute effects by going through each effect on the card
-            foreach (var effect in card.CardEffects)
+            foreach (var effect in card.Definition.CardEffects)
             {
                 var result = _registry.Execute(
                     effect.EffectId,
                     card,
                     context,
-                    effect.GetAmount()
+                    effect.GetAmount(),
+                    target
                 );
 
                 context.Log(result.Message);
@@ -60,13 +61,13 @@ namespace PathOfIrregulars.Application.Services
                     return result;
             }
 
-            if (card.Type != CardType.Climber)
+            if (card.Definition.Type != CardType.Climber)
             {
                 context.ActivePlayer.Graveyard.Add(card);
-                context.Log($"{card.Name} was sent to the graveyard.");
+                context.Log($"{card.Definition.Name} was sent to the graveyard.");
             }
 
-            return EffectResult.Ok($"{card.Name} played successfully.");
+            return EffectResult.Ok($"{card.Definition.Name} played successfully.");
         }
 
 
