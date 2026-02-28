@@ -3,13 +3,13 @@
     {
       "Id": "bam_irregular",
       "Name": "Bam,Irregular",
-      "Description":  "On Play: Buff own power by 2.",
+      "Description": "On Play: Buff own power by 2.",
       "Type": "Climber",
       "Power": 5,
       "Effects": [
         {
           "EffectId": "BuffSelf",
-          "Trigger":  "OnPlay",
+          "Trigger": "OnPlay",
           "Parameters": { "amount": 2 }
         }
       ]
@@ -23,7 +23,7 @@
       "Effects": [
         {
           "EffectId": "DrawCard",
-          "Trigger" :  "OnPlay",
+          "Trigger": "OnPlay",
           "Parameters": { "amount": 1 }
         }
       ]
@@ -31,7 +31,7 @@
     {
       "Id": "rak_spear_bearer",
       "Name": "Rak,Spear Bearer",
-      "Description" :  "",
+      "Description": "",
       "Type": "Climber",
       "Power": 7,
       "Effects": []
@@ -45,7 +45,7 @@
       "Effects": [
         {
           "EffectId": "DealDamageToTarget",
-          "Trigger":  "OnPlay",
+          "Trigger": "OnPlay",
           "Parameters": { "amount": 2 }
         }
       ]
@@ -59,7 +59,7 @@
       "Effects": [
         {
           "EffectId": "DealDamageToTarget",
-          "Trigger":  "OnPlay",
+          "Trigger": "OnPlay",
           "Parameters": { "amount": 4 }
         }
       ]
@@ -73,7 +73,7 @@
       "Effects": [
         {
           "EffectId": "BuffCardToTarget",
-          "Trigger":  "OnPlay",
+          "Trigger": "OnPlay",
           "Parameters": { "amount": 3 }
         }
       ]
@@ -87,7 +87,7 @@
       "Effects": [
         {
           "EffectId": "DrawCard",
-          "Trigger":  "OnPlay",
+          "Trigger": "OnPlay",
           "Parameters": { "amount": 2 }
         }
       ]
@@ -108,7 +108,7 @@
       "Effects": [
         {
           "EffectId": "DealDamageToTarget",
-          "Trigger":  "OnEquip",
+          "Trigger": "OnEquip",
           "Parameters": { "amount": 3 }
         }
       ]
@@ -122,8 +122,332 @@
       "Effects": [
         {
           "EffectId": "DealDamageToTarget",
-          "Trigger" :  "OnPlay",
+          "Trigger": "OnPlay",
           "Parameters": { "amount": 6 }
+        }
+      ]
+    },
+    {
+      "Id": "endorsi_zahard",
+      "Name": "Endorsi Zahard",
+      "Description": "On Kill: Boost self by 3",
+      "Type": "Climber",
+      "Power": 2,
+      "Effects": [
+        {
+          "EffectId": "BuffSelf",
+          "Trigger": "OnRoundEnd",
+          "Parameters": {
+            "amount": 1
+          }
+        }
+      ]
+    },
+    {
+      "Id": "shibisu_scout",
+      "Name": "Shibisu",
+      "Description": "On Play: Look at top 2 cards of deck",
+      "Type": "Climber",
+      "Power": 3,
+      "Effects": [
+        {
+          "EffectId": "Scry",
+          "Trigger": "OnPlay",
+          "Parameters": { "amount": 2 }
+        }
+      ]
+    },
+    {
+      "Id": "hwa_ryun_guide",
+      "Name": "Hwa Ryun",
+      "Description": "On Play: Boost an ally by 3",
+      "Type": "Climber",
+      "Power": 4,
+      "Effects": [
+        {
+          "EffectId": "BuffCardToTarget",
+          "Trigger": "OnPlay",
+          "Parameters": {
+            "amount": 3
+          }
+        }
+      ]
+    },
+    {
+      "Id": "white_clone",
+      "Name": "White's Clone",
+      "Description": "On Death: Draw 1 card",
+      "Type": "Climber",
+      "Power": 2,
+      "Effects": [
+        {
+          "EffectId": "DrawCard",
+          "Trigger": "OnDeath",
+          "Parameters": { "amount": 1 }
+        }
+      ]
+    },
+    {
+      "Id": "shinsu_reinforcement_spell",
+      "Name": "Shinsu Reinforcement",
+      "Description": "On Play: Buff target by 4",
+      "Type": "Spell",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "BuffCardToTarget",
+          "Trigger": "OnPlay",
+          "Parameters": { "amount": 4 }
+        }
+      ]
+    },
+    {
+      "Id": "emergency_healing_spell",
+      "Name": "Emergency Healing",
+      "Description": "On Play: Heal self by 5",
+      "Type": "Spell",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "HealTarget",
+          "Trigger": "OnPlay",
+          "Parameters": { "amount": 5 }
+        }
+      ]
+    },
+    {
+      "Id": "lethal_assassination_spell",
+      "Name": "Lethal Assassination",
+      "Description": "On Play: Kill target",
+      "Type": "Spell",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "KillTarget",
+          "Trigger": "OnPlay",
+          "Parameters": { "amount": 0 }
+        }
+      ]
+    },
+    {
+      "Id": "reckless_sacrifice_spell",
+      "Name": "Reckless Sacrifice",
+      "Description": "On Play: Deal 4 damage to target and 2 to self",
+      "Type": "Spell",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "DealDamageToTarget",
+          "Trigger": "OnPlay",
+          "Parameters": { "amount": 4 }
+        },
+        {
+          "EffectId": "DealDamageToSelf",
+          "Trigger": "OnPlay",
+          "Parameters": { "amount": 2 }
+        }
+      ]
+    },
+
+    {
+      "Id": "ignition_weapon_artifact",
+      "Name": "Ignition Weapon",
+      "Description": "On Equip: Buff self by 3",
+      "Type": "Artifact",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "BuffSelf",
+          "Trigger": "OnEquip",
+          "Parameters": { "amount": 3 }
+        }
+      ]
+    },
+    {
+      "Id": "ancient_shield_artifact",
+      "Name": "Ancient Shield",
+      "Description": "On Equip: Heal self by 3",
+      "Type": "Artifact",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "HealTarget",
+          "Trigger": "OnEquip",
+          "Parameters": { "amount": 3 }
+        }
+      ]
+    },
+    {
+      "Id": "blood_contract_artifact",
+      "Name": "Blood Contract",
+      "Description": "On Equip: Buff self by 5 and deal 2 damage to self",
+      "Type": "Artifact",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "BuffSelf",
+          "Trigger": "OnEquip",
+          "Parameters": { "amount": 5 }
+        },
+        {
+          "EffectId": "DealDamageToSelf",
+          "Trigger": "OnEquip",
+          "Parameters": { "amount": 2 }
+        }
+      ]
+    },
+    {
+      "Id": "observer_device_artifact",
+      "Name": "Observer Device",
+      "Description": "On Equip: Draw 1 card",
+      "Type": "Artifact",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "DrawCard",
+          "Trigger": "OnEquip",
+          "Parameters": { "amount": 1 }
+        }
+      ]
+    },
+    {
+      "Id": "ranker_badge_artifact",
+      "Name": "Ranker Badge",
+      "Description": "On Equip: Buff self by 2",
+      "Type": "Artifact",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "BuffSelf",
+          "Trigger": "OnEquip",
+          "Parameters": { "amount": 2 }
+        }
+      ]
+    },
+
+    {
+      "Id": "hell_train_veteran",
+      "Name": "Hell Train Veteran",
+      "Description": "On Turn Start: Buff self by 1",
+      "Type": "Climber",
+      "Power": 5,
+      "Effects": [
+        {
+          "EffectId": "BuffSelf",
+          "Trigger": "OnTurnStart",
+          "Parameters": { "amount": 1 }
+        }
+      ]
+    },
+    {
+      "Id": "floor_guardian_avatar",
+      "Name": "Floor Guardian Avatar",
+      "Description": "On Play: Heal Target by 4",
+      "Type": "Climber",
+      "Power": 4,
+      "Effects": [
+        {
+          "EffectId": "HealTarget",
+          "Trigger": "OnPlay",
+          "Parameters": { "amount": 4 }
+        }
+      ]
+    },
+    {
+      "Id": "fug_shadow_agent",
+      "Name": "FUG Shadow Agent",
+      "Description": "On Death: Draw 1 card",
+      "Type": "Climber",
+      "Power": 3,
+      "Effects": [
+        {
+          "EffectId": "DrawCard",
+          "Trigger": "OnDeath",
+          "Parameters": { "amount": 1 }
+        }
+      ]
+    },
+    {
+      "Id": "zahard_elite_soldier",
+      "Name": "Zahard Elite Soldier",
+      "Description": "On Play: Buff self by 2",
+      "Type": "Climber",
+      "Power": 4,
+      "Effects": [
+        {
+          "EffectId": "BuffSelf",
+          "Trigger": "OnPlay",
+          "Parameters": { "amount": 2 }
+        }
+      ]
+    },
+    {
+      "Id": "irregular_outburst",
+      "Name": "Irregular Outburst",
+      "Description": "On Play: Deal 5 damage to target",
+      "Type": "Spell",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "DealDamageToTarget",
+          "Trigger": "OnPlay",
+          "Parameters": { "amount": 5 }
+        }
+      ]
+    },
+    {
+      "Id": "princess_pride",
+      "Name": "Princess Pride",
+      "Description": "On Play: Buff self by 3",
+      "Type": "Spell",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "BuffSelf",
+          "Trigger": "OnPlay",
+          "Parameters": { "amount": 3 }
+        }
+      ]
+    },
+    {
+      "Id": "contract_of_power",
+      "Name": "Contract of Power",
+      "Description": "On Equip: Buff self by 4",
+      "Type": "Artifact",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "BuffSelf",
+          "Trigger": "OnEquip",
+          "Parameters": { "amount": 4 }
+        }
+      ]
+    },
+    {
+      "Id": "shinsu_explosion",
+      "Name": "Shinsu Explosion",
+      "Description": "On Play: Deal 4 damage to target",
+      "Type": "Spell",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "DealDamageToTarget",
+          "Trigger": "OnPlay",
+          "Parameters": { "amount": 4 }
+        }
+      ]
+    },
+    {
+      "Id": "guardian_blessing",
+      "Name": "Guardian Blessing",
+      "Description": "On Play: Heal self by 4",
+      "Type": "Spell",
+      "Power": 0,
+      "Effects": [
+        {
+          "EffectId": "HealTarget",
+          "Trigger": "OnPlay",
+          "Parameters": { "amount": 4 }
         }
       ]
     }

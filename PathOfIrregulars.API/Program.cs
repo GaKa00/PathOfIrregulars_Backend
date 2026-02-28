@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Hosting;
@@ -220,13 +221,24 @@ namespace PathOfIrregulars.API
 
 
             // Get decks for specific account
-            app.MapGet("/account/{id}/decks", async (int id, POIdbContext db) =>
+            app.MapGet("/accounts/{id}/decks", async (int id, POIdbContext db) =>
             {
                 var account =  await db.Accounts.Include(a => a.Decks).ThenInclude(d => d.Cards).FirstOrDefaultAsync(a => a.Id == id);
                 if (account == null)
                     return Results.NotFound();
 
                 return Results.Ok(account.Decks);
+            });
+
+            //get specific deck for account 
+            app.MapGet("/accounts/{id}/decks{deckid}", async (int id, POIdbContext db, int deckid) =>
+            {
+        
+                var deck = db.Decks.Include(d => d.AccountId).FirstOrDefaultAsync(d => d.Id == deckid);
+
+                if (deck == null) return Results.NotFound();
+
+                return Results.Ok(deck);
             });
 
             //create a deck for user
@@ -276,7 +288,7 @@ namespace PathOfIrregulars.API
 
                     return Results.Created(
             $"/accounts/{account.Id}/decks/{deck.Id}",
-            deck.Id
+            deck
         );
                 });
 
