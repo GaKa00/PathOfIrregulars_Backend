@@ -12,6 +12,9 @@ namespace PathOfIrregulars.Application
         public string Name { get; set; }
         public int HandSize { get; set; }
         public int DeckSize { get; set; }
+
+        public List<CardInstance>? Hand { get; set; }  
+        public List<CardInstance>? Graveyard { get; set; }
         public int TotalPower { get; set; }
         public int WonRounds { get; set; }
         public bool HasPassed { get; set; }
@@ -25,6 +28,8 @@ namespace PathOfIrregulars.Application
                 Name = player.Name,
                 HandSize = player.Hand.Count,
                 DeckSize = player.Deck.Count,
+                Hand = player.Hand,
+                Graveyard = player.Graveyard,
                 TotalPower = player.TotalPower,
                 WonRounds = player.WonRounds,
                 HasPassed = player.HasPassed,
