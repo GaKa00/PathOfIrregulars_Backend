@@ -51,6 +51,7 @@ namespace PathOfIrregulars.Domain.Entities
             {
                 Id = this.Id,
                 Name = this.Name,
+                Description = this.Description,
                 Type = this.Type,
                 Power= this.Power,
                     
