@@ -408,36 +408,7 @@ namespace PathOfIrregulars.API
                 );
             });
 
-            app.MapPut("/matches/{matchId}/players/{playerId}/endTurn", ( Guid matchId, int playerId) =>
-            {
-
-                if (!MatchStore.OngoingMatches.TryGetValue(matchId, out var match))
-                {
-                    return Results.NotFound("Match not found.");
-                }
-                var ActivePlayer = match.ActivePlayer;
-                if (ActivePlayer.Id != playerId)
-                {
-                    return Results.BadRequest("It's not the player's turn.");
-                }
-
-                if (ActivePlayer.Hand.Count == 0)
-                {
-
-                    ActivePlayer.HasPassed = true;
-                    return Results.Ok(
-                        MatchMapper.ToDto(matchId, match)
-                    );
-
-
-                }
-
-                match.EndTurn();
-                return Results.Ok(
-                    MatchMapper.ToDto(matchId, match)
-                );
-
-            });
+           
 
             app.MapPut("/matches/{matchId}/players/{playerId}/playCard", (Guid matchId, int playerId, string cardId, string? laneId, string? targetId) =>
             {
@@ -461,6 +432,7 @@ namespace PathOfIrregulars.API
 
              
                 match.PlayCard(ActivePlayer.Name, cardToPlay.Definition.Id, laneId, targetId  );
+                match.EndTurn();
 
                 return Results.Ok(
                     MatchMapper.ToDto(matchId, match)
